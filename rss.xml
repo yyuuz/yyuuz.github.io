@@ -1,0 +1,562 @@
+<?xml version="1.0"?>
+<rss version="2.0">
+    <channel>
+        <title></title>
+        <subtitle>In a champagne supernova in the sky</subtitle>
+        <icon>https://yyuuz.github.io/assets/favicon.ico</icon>
+        <link>https://yyuuz.github.io</link>
+        <author>
+          <name>GuitarYui</name>
+        </author>
+        <description></description>
+        <language>zh-CN</language>
+        <pubDate>Fri, 09 Aug 2024 00:00:00 +0800</pubDate>
+        <lastBuildDate>Fri, 09 Aug 2024 00:00:00 +0800</lastBuildDate>
+        <item>
+            <guid isPermalink="true">https://yyuuz.github.io/2024/08/09/ANNS/CXL-ANNS/</guid>
+            <title>CXL-ANNS</title>
+            <link>https://yyuuz.github.io/2024/08/09/ANNS/CXL-ANNS/</link>
+            <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
+            <category term="CXL" scheme="https://yyuuz.github.io/tags/CXL/" />
+            <category term="ANNS/搜索" scheme="https://yyuuz.github.io/tags/ANNS-%E6%90%9C%E7%B4%A2/" />
+            <pubDate>Fri, 09 Aug 2024 00:00:00 +0800</pubDate>
+            <description><![CDATA[ &lt;p&gt;CXL-ANNS: Software-Hardware Collaborative Memory Disaggregation and Computation for Billion-Scale Approximate Nearest Neighbor Search&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;缩略词&lt;/th&gt;
+&lt;th&gt;释义&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;BI&lt;/td&gt;
+&lt;td&gt;Back Invalidation&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;DPA&lt;/td&gt;
+&lt;td&gt;Device Physical Address，设备物理地址&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;DSP&lt;/td&gt;
+&lt;td&gt;Downstream Switch Port，Switch 的下行端口&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;eRCD&lt;/td&gt;
+&lt;td&gt;Exclusive Restricted CXL Device，只支持 CXL 1.1 的 CXL Device&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;HDM&lt;/td&gt;
+&lt;td&gt;Host-managed Device Memory，由 Host 管理的 Device Memory&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;HPA&lt;/td&gt;
+&lt;td&gt;Host Physical Address，主机物理地址&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;IG&lt;/td&gt;
+&lt;td&gt;Interleave Granularity，交织粒度&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;IW&lt;/td&gt;
+&lt;td&gt;Interleave Way，交织路数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;RP&lt;/td&gt;
+&lt;td&gt;Root Port，根节点&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;UIO&lt;/td&gt;
+&lt;td&gt;Unordered Input/Output，无序 IO&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;USP&lt;/td&gt;
+&lt;td&gt;Upstream Switch Port，Switch 的上行端口&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h1 id=&#34;introduction&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#introduction&#34;&gt;#&lt;/a&gt; Introduction&lt;/h1&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809123737.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;不同的近似最近邻搜索（ANNS）系统在三个关键维度上的性能对比：&lt;strong&gt;可扩展性（Scalability）&lt;/strong&gt;、&lt;strong&gt;性能（Performance）&lt;/strong&gt; 和 &lt;strong&gt;准确性（Accuracy）&lt;/strong&gt;。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;可扩展性（Scalability）&lt;/strong&gt;：指系统处理大规模数据集的能力。图中的可扩展性维度表示了系统在处理大规模 ANNS 任务时的有效性。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;性能（Performance）&lt;/strong&gt;：指系统执行 ANNS 任务的速度和效率。图中的性能维度表示了系统在实际操作中的效率。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;准确性（Accuracy）&lt;/strong&gt;：指 ANNS 任务的准确度，图中的准确性维度表示了系统在查询结果上的精度。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;图 1 (a): 以前的研究&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Oracle&lt;/strong&gt;：代表理想化的基准系统，具有最优的可扩展性、性能和准确性。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Hierarchical（分层存储）&lt;/strong&gt;：通过分层存储技术来处理大规模数据，但在某些维度上可能有所牺牲（例如，可能在性能或准确性上有所下降）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Compression（压缩）&lt;/strong&gt;：使用数据压缩方法来提高内存利用率，但可能会影响数据的准确性和性能。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;图 1 (b): 基于 CXL 的方法&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;CXL&lt;/strong&gt;：表示基于 Compute Express Link（CXL）技术的 ANNS 系统，展示了在可扩展性和性能上的显著改进，同时保持较高的准确性。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;CXL-ANNS&lt;/strong&gt;：论文中提出的系统，利用 CXL 技术的优势，通过软硬件协同优化，在可扩展性、性能和准确性三个维度上均表现出色。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;贡献&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#贡献&#34;&gt;#&lt;/a&gt; 贡献&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;关系感知图缓存&lt;/strong&gt;：选择性地将图和特征向量放置在 CXL 内存网络的不同位置。具体而言，CXL-ANNS 将节点信息分配到靠近入口节点的本地附加 DRAM 中，而将其他数据集放置在 CXL 内存池中。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;隐藏 CXL 内存池的延迟&lt;/strong&gt;：提出了一种简单的预见技术，利用 ANNS 独特的图遍历特性，在当前 kNN 候选更新阶段预取下一个邻居的数据集。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;CXL 中的协作 kNN 搜索设计&lt;/strong&gt;：EP 控制器来计算距离，图遍历和候选更新。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;减少依赖与调度&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;设计&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#设计&#34;&gt;#&lt;/a&gt; 设计&lt;/h1&gt;
+&lt;h2 id=&#34;节点级关系&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#节点级关系&#34;&gt;#&lt;/a&gt; 节点级关系&lt;/h2&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809123755.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;将 enterpoint 的 2~3 跳图和节点数据放入 DRAM, 其余存入 CXL EPs&lt;/p&gt;
+&lt;h2 id=&#34;距离计算&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#距离计算&#34;&gt;#&lt;/a&gt; 距离计算&lt;/h2&gt;
+&lt;h2 id=&#34;减少数据传输&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#减少数据传输&#34;&gt;#&lt;/a&gt; 减少数据传输&lt;/h2&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809123805.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;CXL EP 只传输计算后的距离&lt;/p&gt;
+&lt;h2 id=&#34;cxlanns架构&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#cxlanns架构&#34;&gt;#&lt;/a&gt; CXLANNS 架构&lt;/h2&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809123816.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;CXLANNS 架构的高层次视图，主要由 i) RC 端软件栈和 ii) EP 端数据处理硬件栈构成。&lt;/p&gt;
+&lt;h3 id=&#34;rc端软件栈&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#rc端软件栈&#34;&gt;#&lt;/a&gt; RC 端软件栈&lt;/h3&gt;
+&lt;p&gt;此 RC 端软件栈由 i) 查询调度程序、ii) 池管理器和 iii) 内核驱动程序组成。在 CXL-ANNS 的顶部，查询调度程序处理来自其应用程序（如推荐系统）的所有 kNN 搜索请求。它将每个查询拆分为三个子任务（图遍历、距离计算和候选更新），并在不同的位置分配这些任务。具体而言，图遍历和候选更新子任务在 CXL CPU 端执行，而调度程序通过与底层池管理器协作将距离计算分配给底层 EP。池管理器处理 CXL 的 HPA，以考虑图形和数据向量的边缘跳数，从而可以根据节点级关系区分图形访问。最后，内核驱动程序管理底层 EP 及其地址空间；它枚举 EP 并将其 HDM 映射到系统内存的 HPA 中，供池管理器使用。由于对 HPA 的所有内存请求都在 CXL CPU 中缓存，驱动程序使用 CXL.io 而不是 CXL.mem 将 EP 端接口寄存器映射到 RC 的 PCIe 地址空间。请注意，由于存在内存映射寄存器的 PCIe 空间是在非缓存区域，底层 EP 可以立即识别主机端应用程序让 EP 知道的内容。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809123825.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;h4 id=&#34;图形构建用于本地缓存&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#图形构建用于本地缓存&#34;&gt;#&lt;/a&gt; 图形构建用于本地缓存&lt;/h4&gt;
+&lt;p&gt;当池管理器将大部分图数据和所有数据向量分配给底层的 CXL 内存池时，它会将预计最常访问的节点在本地 DRAM 中缓存，尽可能地利用系统内存容量。为此，池管理器考虑从固定的入口节点到每个节点的边缘跳数（即，计算边缘跳数）以用于其关系感知图缓存。图 13 说明了池管理器如何将给定图中的节点分配到不同的位置（本地内存与 CXL 内存池）。在构建图时，池管理器利用 [[单源最短路径（SSSP）]] 算法计算每个节点的跳数；它首先让图中的所有节点具有负跳数（例如，-1）。从入口节点开始，池管理器检查一个边缘跳中的所有节点并增加其跳数。它访问每个节点并对其迭代此过程，直到没有节点可在广度优先搜索的方式中访问。一旦每个节点都有自己的跳数，池管理器根据跳数升序对它们进行排序，并将节点从顶部（具有最小跳数）分配到本地 DRAM 中，尽可能多地进行分配。本地 DRAM 的可用大小可以通过参考系统配置变量（sysconf ()）中的总页数（SC_AVPHYS_PAGES）和每页的大小（SC_PAGESIZE）简单估算。值得一提的是，在本研究中，池管理器在用户空间中使用多个线程执行 SSSP，旨在减少构建时间。&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809123836.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;h4 id=&#34;池管理对于向量图&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#池管理对于向量图&#34;&gt;#&lt;/a&gt; 池管理对于向量 / 图&lt;/h4&gt;
+&lt;p&gt;在 CXL arenas 中，CXL EP 的底层 HDM 直接暴露给用户级空间，因此需要很好地管理以适应所有十亿点数据集的内存使用行为。池管理器考虑到数据集的两个方面；数据向量（即嵌入表）应位于一个相当大且连续的内存空间中，而图结构需要处理许多长度可变的邻居列表（16B∼1KB）。池管理器采用类栈和伙伴式内存分配器，分别在每个 CXL arenas 中向上和向下增长。前者分配器具有一个范围指针，并管理嵌入表的内存，类似于栈。&lt;strong&gt;池管理器在多个 CXL arenas 以轮询方式分配数据向量&lt;/strong&gt;，[[#^ac83ec | 向量分片]]。相反，伙伴式分配器采用级别指针，每个级别由一个链表组成，该链表连接不同大小的数据块（从 16B 到 1KB）。像 Linux 伙伴内存管理器一样，它根据每个邻居列表的确切需求分配 CXL 内存空间，并根据工作负载行为合并 / 拆分块。为了使每个 EP 保持平衡，池&lt;strong&gt;管理器以轮询方式跨不同 CXL arenas 分配每跳的邻居列表&lt;/strong&gt;。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;意思是 figure 13 第三步吗，但后面又说是把每个向量的不同部分存在 EP 中&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;ep端硬件栈&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#ep端硬件栈&#34;&gt;#&lt;/a&gt; EP 端硬件栈&lt;/h3&gt;
+&lt;p&gt;EP 端硬件堆栈包括一个用于距离计算的领域特定加速器（DSA），以及构建基于 CXL 的内存扩展器所需的所有基本硬件组件。在我们的 EP 前端，实现了物理层（PHY）控制器和 CXL 引擎，它们分别负责 PCIe/CXL 通信控制和突发到内存请求的转换。转换后的内存请求被转发到底层内存控制器，该控制器连接其后端的多个 DRAM 模块；在我们的原型中，一个 EP 有四个内存控制器，每个控制器都有一个 256GB DRAM 模块的 DIMM 通道。另一方面，DSA 位于 CXL 引擎和内存控制器之间。它可以使用内存控制器读取数据向量，同时通过 CXL 引擎的接口寄存器检查操作命令。这些接口寄存器被映射到主机的非缓存 PCIe 空间，以便主机写入的所有命令可以立即对 DSA 可见。DSA 使用多个处理元素（PE）计算多个数据向量的近似距离，每个处理元素具有简单的算术单元，如加法器 / 减法器和乘法器。&lt;/p&gt;
+&lt;h4 id=&#34;协作查询服务加速&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#协作查询服务加速&#34;&gt;#&lt;/a&gt; 协作查询服务加速&lt;/h4&gt;
+&lt;h5 id=&#34;距离计算加速&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#距离计算加速&#34;&gt;#&lt;/a&gt; 距离计算加速&lt;/h5&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809123850.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;每个 EP 有许多 processing element (PE)，在论文中的原型中为 10 个。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;向量分片&lt;/strong&gt;。如果我们从 EP 的起始地址以连续的顺序定位嵌入表，EP 的后端 DRAM 带宽可能在我们的设计中成为瓶颈。这是因为嵌入表中的每个特征向量都是由高维信息编码的（约 256 维，约占 1KB）。（意思是每个 EP 的 DRAM 带宽连一个向量都取不出来？）为了解决这个问题，我们的池管理器按列对嵌入表进行分片，并将表的不同部分存储在不同的 EP 中。如图 15b 所示，这种向量分片根据每个 EP 的 I/O 粒度（256B）将每个向量分割成多个子向量。每个 EP 同时计算其所容纳的分割数据向量的子距离。随后，CXL CPU 累加子距离以获得最终的距离值。 ^ac83ec&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;与 EP 级加速的接口&lt;/strong&gt;。接口寄存器仅处理命令到达的事件，称为门铃，而每个 EP 的 CXL 引擎以主动方式从 CPU 侧本地 DRAM（称为命令缓冲区）中获取相应的操作类型和邻居列表。CXL 引擎还将距离计算的结果推送到本地 DRAM，以便 RC 侧软件可以直接访问结果，而无需访问底层 CXL 内存池。&lt;/p&gt;
+&lt;h5 id=&#34;cxl内存池的预取&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#cxl内存池的预取&#34;&gt;#&lt;/a&gt; CXL 内存池的预取&lt;/h5&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808131540.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;Graph read: cxl侧访问邻居表传给cpu
+Graph trav: cpu将要计算的邻居节点传给cxl
+Dist calc:ep计算距离传给cpu
+Cand update:cpu累加子距离并排序更新
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;图 17a 展示了我们协作查询服务加速的基线，这让 EP 能够在 ANNS 的图遍历和候选更新（包括子距离累积）在 CPU 侧处理时计算子距离。该调度模式会不断迭代，直到没有更多的 kNN 候选需要访问（算法 1）。这种基线方法的挑战在于，一旦 CPU 侧所有节点信息准备就绪，才可以开始图遍历。虽然我们的池管理器的本地缓存解决了这个问题，但其性能仍然有限。需要通过 CXL 内存池获取节点，这些节点并不位于最内层的边缘跳跃中。由于访问底层内存池的延迟较长，图遍历可以相对被推迟。为此，我们的查询调度器在实际遍历子任务需要之前更早地预取图信息，如图 17b 所示。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;查询调度器&lt;/strong&gt;预测要访问的节点，并通过参考候选数组来获取其邻居信息。我们可以看到，总访问节点中有 82.3% 来自候选数组。意思就是取优先队列的第一个？&lt;/p&gt;
+&lt;h5 id=&#34;细粒度查询调度&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#细粒度查询调度&#34;&gt;#&lt;/a&gt; 细粒度查询调度&lt;/h5&gt;
+&lt;p&gt;RC-CPU 在 EP 距离计算时还是没事干，于是 &lt;code&gt;Cand update&lt;/code&gt;  时先进行节点选择传给 CXL 再进行插入和排序。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;但是你不排序怎么选择呢？不还是预测吗
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h1 id=&#34;实验分析&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#实验分析&#34;&gt;#&lt;/a&gt; 实验分析&lt;/h1&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808182114.png&#34; alt=&#34;image.png&#34; /&gt;&lt;br /&gt;
+ 主要提升来自 DSA 和 cache (包括预取)&lt;/p&gt;
+&lt;h1 id=&#34;参考&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#参考&#34;&gt;#&lt;/a&gt; 参考&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&#34;https://www.ctyun.cn/developer/article/464924478537797&#34;&gt;ATC2023 论文分享之 “CXL-ANNS”- 天翼云开发者社区 - 天翼云 (ctyun.cn)&lt;/a&gt;&lt;/p&gt;
+ ]]></description>
+        </item>
+        <item>
+            <guid isPermalink="true">https://yyuuz.github.io/2024/08/09/ANNS/%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84ANNS%E6%9E%84%E5%BB%BA%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3/</guid>
+            <title>基于图的ANNS构建索引相关</title>
+            <link>https://yyuuz.github.io/2024/08/09/ANNS/%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84ANNS%E6%9E%84%E5%BB%BA%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3/</link>
+            <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
+            <category term="ANNS/GPU" scheme="https://yyuuz.github.io/tags/ANNS-GPU/" />
+            <category term="ANNS/索引" scheme="https://yyuuz.github.io/tags/ANNS-%E7%B4%A2%E5%BC%95/" />
+            <category term="HNSW" scheme="https://yyuuz.github.io/tags/HNSW/" />
+            <pubDate>Fri, 09 Aug 2024 00:00:00 +0800</pubDate>
+            <description><![CDATA[ &lt;p&gt;基础的索引构建算法&lt;/p&gt;
+&lt;h1 id=&#34;knn图&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#knn图&#34;&gt;#&lt;/a&gt; KNN 图&lt;/h1&gt;
+&lt;h2 id=&#34;nn-descent&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#nn-descent&#34;&gt;#&lt;/a&gt; &lt;a href=&#34;https://blog.csdn.net/whenever5225/article/details/105598694&#34;&gt;NN-Descent&lt;/a&gt;&lt;/h2&gt;
+&lt;h2 id=&#34;nn-descentfull&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#nn-descentfull&#34;&gt;#&lt;/a&gt; &lt;a href=&#34;https://lsyhprum.github.io/2021/07/01/NN-Descent%E8%AE%BA%E6%96%87%E6%B5%85%E6%9E%90/&#34;&gt;NN-DescentFULL&lt;/a&gt;&lt;/h2&gt;
+&lt;h1 id=&#34;nsw&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#nsw&#34;&gt;#&lt;/a&gt; NSW&lt;/h1&gt;
+&lt;p&gt;找到节点𝑣𝑖最近邻的 𝑓 个邻居，建立𝑣𝑖和这些邻居的边连接&lt;/p&gt;
+&lt;h1 id=&#34;hnsw&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#hnsw&#34;&gt;#&lt;/a&gt; HNSW&lt;/h1&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230011.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;确定一个 I,p 从 0 到 I 都会出现&lt;br /&gt;
+&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230019.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;第一阶段：从顶层到第 I+1 层遍历，ef=1，ep = 唯一找到的点；&lt;br /&gt;
+ 第二阶段：&lt;br /&gt;
+9. 从第 I 层到 0 层遍历，ef,ep=w (ef 个最近邻节点的集合)&lt;br /&gt;
+&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230102.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;10.W 选 M 个节点于 q 连接，两种方法&lt;br /&gt;
+&lt;strong&gt; SIMPLE&lt;/strong&gt; 的：&lt;br /&gt;
+&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230111.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;直接选最近的&lt;br /&gt;
+&lt;strong&gt; HEURISTIC&lt;/strong&gt; 的：&lt;br /&gt;
+&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230118.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;要连接的点 p1（p1，q) 要比（所有？还是只需一个？应该是所有）原有的连接点 p2，(p1,p2) 小才允许连接，（p1，q)&amp;lt;(p1,p2)&lt;br /&gt;
+&lt;strong&gt; 为了在不同方向上选择邻居，从而避免邻居扎堆 “高速公路”&lt;/strong&gt;&lt;br /&gt;
+ 最后检查连接的邻居，用上面的算法缩减它们的邻居个数至 Wmax&lt;/p&gt;
+&lt;h1 id=&#34;gpu-accelerated-proximity-graph-approximate-nearest-neighbor-search-and-construction&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#gpu-accelerated-proximity-graph-approximate-nearest-neighbor-search-and-construction&#34;&gt;#&lt;/a&gt; GPU-accelerated Proximity Graph Approximate Nearest Neighbor Search and Construction&lt;/h1&gt;
+&lt;h2 id=&#34;构建nsg图&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#构建nsg图&#34;&gt;#&lt;/a&gt; 构建 NSG 图&lt;/h2&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230131.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;这个算法是一个基于 GPU 的近邻搜索图（NSW，Navigable Small World Graph）构建算法。该算法旨在通过平行处理来构建一个包含点集合的近邻图，其中每个节点的度数在指定的最小度数 (d_{min}) 和最大度数 (d_{max}) 之间。具体步骤如下：&lt;/p&gt;
+&lt;h3 id=&#34;输入&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#输入&#34;&gt;#&lt;/a&gt; 输入：&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;P&lt;/strong&gt;: 一个点的集合。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;(d_{min})&lt;/strong&gt;: 图中节点的最小度数。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;(d_{max})&lt;/strong&gt;: 图中节点的最大度数。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;输出&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#输出&#34;&gt;#&lt;/a&gt; 输出：&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;G&lt;/strong&gt;: 一个近邻图 (G = (V, E))，包含节点集 (V) 和边集 (E)。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;步骤&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#步骤&#34;&gt;#&lt;/a&gt; 步骤：&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;划分点集合&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;将点集合 (P) 划分为互不相交的子集 (P_0, P_1, \ldots, P_t)。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;初始化图子集&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;并行（跨 GPU 块）初始化每个划分 (P_i) 的空图子集 (G_i)。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;局部邻居搜索和更新&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;对于划分 (P_i) 中的每个点 (v_{ij})：
+&lt;ul&gt;
+&lt;li&gt;在局部图子集 (G_i) 中找到初始邻居 (v_{ij}.N) 和 (v_{ij}.N&#39;)，确保度数不少于 (d_{min})。&lt;/li&gt;
+&lt;li&gt;对于 (v_{ij}) 的每个邻居 (u_{ij})：
+&lt;ul&gt;
+&lt;li&gt;在块内并行，将 (v_{ij}) 添加到 (u_{ij}) 的邻居中。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;全局邻居搜索和更新&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;对于每个划分 (i) 从 1 到 (t)：
+&lt;ul&gt;
+&lt;li&gt;初始化空边集 (E) 和索引集 (I)。&lt;/li&gt;
+&lt;li&gt;并行（跨 GPU 块）处理 (G_i) 中的每个点 (v_{ij})：
+&lt;ul&gt;
+&lt;li&gt;更新 (v_{ij}.N)，通过搜索全局图 (G_0) 确保度数不少于 (d_{min})。&lt;/li&gt;
+&lt;li&gt;在块内并行，将 (v_{ij}.N) 与 (v_{ij}.N&#39;) 合并。&lt;/li&gt;
+&lt;li&gt;对于 (v_{ij}) 的每个邻居 (u_{ij})：
+&lt;ul&gt;
+&lt;li&gt;在块内并行，将边 ((u_{ij} \rightarrow v_{ij}, \delta (u_{ij}, v_{ij}))) 添加到 (E) 中。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;并行（跨 GPU 块）执行 gather-scatter 操作以更新 (E) 和 (I)。&lt;/li&gt;
+&lt;li&gt;并行（跨和块内）更新 (u_{ij}) 的邻居，包含从 (E) 中收集的新边。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;返回最终图&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;返回全局图 (G_0)，它现在表示包含更新后的边和邻居的完整近邻图。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;总结&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#总结&#34;&gt;#&lt;/a&gt; 总结：&lt;/h3&gt;
+&lt;p&gt;该算法有效地利用 GPU 的并行处理能力对点集进行划分、执行局部和全局邻居搜索，并更新图结构。这种方法确保在构建近邻图的同时维持节点度数的约束 (d_{min}) 和 (d_{max})。&lt;/p&gt;
+&lt;h3 id=&#34;关键概念&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#关键概念&#34;&gt;#&lt;/a&gt; 关键概念：&lt;/h3&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;并行处理&lt;/strong&gt;：利用 GPU 块和线程并行执行操作，加速计算过程。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;邻居搜索&lt;/strong&gt;：为每个点找到并更新邻居以构建图。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Gather-Scatter 操作&lt;/strong&gt;：一种高效分布和收集数据的并行技术。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;后向边更新&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#后向边更新&#34;&gt;#&lt;/a&gt; 后向边更新&lt;/h3&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;前向边&lt;/strong&gt;：u 先插入，v 后插入，v 发出 knn 搜索，v-&amp;gt;u 是前向边&lt;br /&gt;
+ ** 后向边：**v 先插入，u 后插入，u 发出 knn 搜索，v-&amp;gt;u 是后向边&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;合并子图时，算法 12-14 行，更新了前向边，但是后向边更新时可能两个 vij 同时搜索到一个点 u，所以先把距离记录到 CSR 表中&lt;br /&gt;
+ [[双调排序]]&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230210.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;h1 id=&#34;fast-k-nn-graph-construction-by-gpu-based-nn-descent&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#fast-k-nn-graph-construction-by-gpu-based-nn-descent&#34;&gt;#&lt;/a&gt; &lt;strong&gt;Fast k-NN graph construction by GPU based NN-Descent&lt;/strong&gt;&lt;/h1&gt;
+ ]]></description>
+        </item>
+        <item>
+            <guid isPermalink="true">https://yyuuz.github.io/2024/08/01/ANNS/DF-GAS_%20a%20Distributed%20FPGA-as-a-Service%20Architecture%20towards%20Billion-Scale%20Graph-based%20Approximate%20Nearest%20Neighbor%20Search/</guid>
+            <title>DF-GAS_ a Distributed FPGA-as-a-Service Architecture towards Billion-Scale Graph-based Approximate Nearest Neighbor Search</title>
+            <link>https://yyuuz.github.io/2024/08/01/ANNS/DF-GAS_%20a%20Distributed%20FPGA-as-a-Service%20Architecture%20towards%20Billion-Scale%20Graph-based%20Approximate%20Nearest%20Neighbor%20Search/</link>
+            <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
+            <category term="ANNS/搜索" scheme="https://yyuuz.github.io/tags/ANNS-%E6%90%9C%E7%B4%A2/" />
+            <category term="ANNS/FPGA" scheme="https://yyuuz.github.io/tags/ANNS-FPGA/" />
+            <pubDate>Thu, 01 Aug 2024 00:00:00 +0800</pubDate>
+            <description><![CDATA[ &lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225752.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;h1 id=&#34;动机&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#动机&#34;&gt;#&lt;/a&gt; 动机&lt;/h1&gt;
+&lt;p&gt;CPU: 细粒度内存访问，线程数不足&lt;br /&gt;
+ GPU: 细粒度内存访问，内存容量小，缺乏流水线并行性（7）&lt;/p&gt;
+&lt;h1 id=&#34;挑战&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#挑战&#34;&gt;#&lt;/a&gt; 挑战&lt;/h1&gt;
+&lt;ol&gt;
+&lt;li&gt;随机细粒度访问&lt;/li&gt;
+&lt;li&gt;长时间远程访问延迟和沉重的通信开销&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&#34;设计&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#设计&#34;&gt;#&lt;/a&gt; 设计&lt;/h1&gt;
+&lt;h3 id=&#34;内存访问引擎memory-access-engines-maes&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#内存访问引擎memory-access-engines-maes&#34;&gt;#&lt;/a&gt; 内存访问引擎（Memory Access Engines, MAEs）&lt;/h3&gt;
+&lt;h4 id=&#34;主要功能&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#主要功能&#34;&gt;#&lt;/a&gt; 主要功能&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;特征打包内存访问（Feature-Packing Memory Access）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;MAEs 通过打包多个特征请求来提高内存访问的效率，增加内存带宽利用率。具体来说，它将多个小规模的内存访问请求合并为一个大规模的请求，从而减少内存访问的开销。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;本地和远程内存访问优化&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;MAEs 优化了本地内存（如 DDR 和 HBM）和远程内存的访问，通过预取和延迟处理等技术减少访问延迟，提高数据传输效率。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;数据预取和延迟处理&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;MAEs 实现了本地数据预取技术，在执行当前迭代时预取下一迭代所需的数据，从而隐藏内存访问延迟。&lt;/li&gt;
+&lt;li&gt;MAEs 还实现了远程数据的延迟访问，通过合并多个远程请求，减少远程访问的频率和开销。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;去重和同步&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;MAEs 包含去重模块，确保访问的节点和数据不重复，从而提高计算效率。&lt;/li&gt;
+&lt;li&gt;MAEs 还包括同步模块，用于在多个 FPGA 节点之间同步数据和指令，确保分布式计算的一致性和协同工作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;设计特点&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#设计特点&#34;&gt;#&lt;/a&gt; 设计特点&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;两级未完成请求生成（Two-Level Outstanding Request Generation）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;通过在细粒度和粗粒度两个层次上合并未完成的内存请求，提高内存级并行性和带宽利用率。&lt;/li&gt;
+&lt;li&gt;将一个 PE 的所有节点请求合并&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;流水线优化（Pipeline Optimization）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;采用任务级流水线技术，将内存访问、距离计算、排序等操作分解为多个子任务并行执行，从而减少每个迭代的总延迟。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;本地数据预取（Local Data Prefetching）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;在当前迭代期间预取下一迭代需要的数据，通过迭代间的数据打包减少延迟。&lt;/li&gt;
+&lt;li&gt;从本地 top-k 列表预测&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;远程访问优化（Remote Access Optimization）&lt;/strong&gt;：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225818.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;包括延迟远程特征访问和预取远程邻居列表技术，分别减少远程特征访问次数和远程访问延迟，提高远程内存访问的效率。&lt;/li&gt;
+&lt;li&gt;（a）skip 挂起远程访问请求直到通信间隔&lt;/li&gt;
+&lt;li&gt;(b)  请求一个远程节点的邻居列表时，将优先队列中所有属于这个远程节点的邻居列表都取回来&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;maes在df-gas架构中的位置&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#maes在df-gas架构中的位置&#34;&gt;#&lt;/a&gt; MAEs 在 DF-GAS 架构中的位置&lt;/h4&gt;
+&lt;p&gt;在 DF-GAS 架构中，每个 FPGA 节点内部包含多个 MAEs，每个 MAE 独立管理和优化内存访问。MAEs 与多个处理单元（PEs）协同工作，通过高带宽内存（HBM）和本地内存（DDR）进行数据传输，并通过网络接口与其他 FPGA 节点进行通信。&lt;br /&gt;
+以下是 DF-GAS 架构图中 MAEs 的位置和组成部分：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;------------------------------------------------
+| FPGA Node                                     |
+|----------------------------------------------|
+|   -----------------------  ----------------   |
+|  | MAE                   |  | PE            |  |
+|  |  - Feature Packing    |  |  - Distance   |  |
+|  |  - Prefetching        |  |    Compute    |  |
+|  |  - Deduplication      |  |  - Sorting    |  |
+|  -----------------------  ----------------   |
+|   -----------------------  ----------------   |
+|  | MAE                   |  | PE            |  |
+|  |  - Feature Packing    |  |  - Distance   |  |
+|  |  - Prefetching        |  |    Compute    |  |
+|  |  - Deduplication      |  |  - Sorting    |  |
+|  -----------------------  ----------------   |
+|----------------------------------------------|
+|  Network Interface                           |
+------------------------------------------------
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;总结&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#总结&#34;&gt;#&lt;/a&gt; 总结&lt;/h3&gt;
+&lt;p&gt;MAEs（内存访问引擎）是 DF-GAS 架构中的重要组成部分，通过优化内存访问，提高内存带宽利用率和数据传输效率，从而显著提升系统性能。MAEs 通过特征打包、数据预取、延迟处理等技术，确保在大规模数据处理任务中实现高效的内存访问和数据管理。&lt;/p&gt;
+&lt;h3 id=&#34;peprocessing-element&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#peprocessing-element&#34;&gt;#&lt;/a&gt; PE（Processing Element）&lt;/h3&gt;
+&lt;h4 id=&#34;主要组件&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#主要组件&#34;&gt;#&lt;/a&gt; 主要组件&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;距离计算单元（Distance Compute Unit, DCU）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;功能&lt;/strong&gt;：计算查询点与数据集中点之间的距离。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;实现&lt;/strong&gt;：采用流水线加法树结构，实现数据并行计算。每个 DCU 包含多个计算单元，通过寄存器和加法树将距离计算并行化。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;本地 Top-K 排序单元（Local Top-K Sorting Unit, LSU）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;功能&lt;/strong&gt;：维护和更新本地 Top-K 候选点。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;实现&lt;/strong&gt;：使用优先队列结构，能够高效地插入和删除元素，保证在每次迭代后，距离最小的 Top-K 点保留在队列中。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;全局 Top-K 排序单元（Global Top-K Sorting Unit, GSU， 可选）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;功能&lt;/strong&gt;：处理跨节点的 Top-K 结果合并。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;实现&lt;/strong&gt;：在分布式环境中，每个节点的 Top-K 结果需要最终合并成全局的 Top-K 结果。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;控制器（Controller）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;功能&lt;/strong&gt;：管理和协调 PE 内部各个模块之间的操作。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;实现&lt;/strong&gt;：基于 RISC-V 兼容的指令集架构，能够灵活配置和调度 PE 的工作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;pe的工作流程&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#pe的工作流程&#34;&gt;#&lt;/a&gt; PE 的工作流程&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;加载特征（Feature Loading）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;从内存中加载当前迭代需要处理的特征向量。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;距离计算（Distance Calculation）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;使用距离计算单元（DCU）计算查询点与特征向量之间的距离。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;更新 Top-K（Top-K Update）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;将计算得到的距离插入到本地 Top-K 排序单元（LSU）中，维护一个有序的 Top-K 列表。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;迭代处理（Iteration Processing）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;继续下一个迭代，重复加载特征、距离计算和更新 Top-K 的过程，直到所有迭代完成。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;结果合并（Result Merging）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;如果是分布式系统，还需要使用全局 Top-K 排序单元（GSU）合并来自不同节点的 Top-K 结果。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;设计细节&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#设计细节&#34;&gt;#&lt;/a&gt; 设计细节&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;数据并行性（Data Parallelism）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;DCU 采用数据并行结构，通过多个计算单元并行处理多个数据点，提高计算效率。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;流水线并行性（Pipeline Parallelism）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;PE 内部各个操作（如特征加载、距离计算、排序等）采用流水线并行方式，进一步减少每个迭代的总延迟。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;优先队列结构（Priority Queue Structure）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;本地 Top-K 排序单元（LSU）使用优先队列结构，确保能够高效地维护和更新 Top-K 候选点。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;可扩展性（Scalability）&lt;/strong&gt;：
+&lt;ul&gt;
+&lt;li&gt;通过多个 PE 并行工作，并结合内存访问引擎（MAEs）优化内存访问，DF-GAS 架构能够高效处理大规模数据集。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;pe设计示意图&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#pe设计示意图&#34;&gt;#&lt;/a&gt; PE 设计示意图&lt;/h3&gt;
+&lt;pre&gt;&lt;code&gt;------------------------------
+|          PE                |
+|----------------------------|
+|  Controller                |
+|  - RISC-V compatible ISA   |
+|----------------------------|
+|  Distance Compute Unit     |
+|  - Data Parallel Structure |
+|  - Pipelined Adder Tree    |
+|----------------------------|
+|  Local Top-K Sorting Unit  |
+|  - Priority Queue Structure|
+|----------------------------|
+|  Global Top-K Sorting Unit | (Optional)
+|  - Merging Results from    |
+|    Different Nodes         |
+------------------------------
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;总结-2&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#总结-2&#34;&gt;#&lt;/a&gt; 总结&lt;/h3&gt;
+&lt;p&gt;PE（Processing Element，处理单元）在 DF-GAS 架构中负责关键的计算任务，包括距离计算和 Top-K 排序。通过数据并行和流水线并行技术，PE 能够高效地执行近似最近邻搜索中的计算操作，确保系统在处理大规模数据集时具有高性能和可扩展性。PE 与内存访问引擎（MAEs）协同工作，实现高效的内存访问和数据处理。&lt;/p&gt;
+&lt;h3 id=&#34;访问列表的硬件优化hvr&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#访问列表的硬件优化hvr&#34;&gt;#&lt;/a&gt; 访问列表的硬件优化：HVR&lt;/h3&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225830.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;HVR 利用 CRC-12 函数 [45] 生成哈希键，用于从 M 槽哈希表中读取出 M 个值。将输入 Nid 与 M 个值同时进行比较，以生成访问信号。如果 Nid 尚未被访问，则选择逻辑根据 M 个有效信号生成下一个插入位置（槽位号），然后将 Nid 插入目标槽。HVR 利用了 8 个带有 K = 1024 个桶的双端口 BRAMs 和 M = 4 个槽，将所需的芯片内存降低到 32KB。HVR 采用双缓冲技术来隐藏初始化的延迟，该延迟会在每次查询时发生。此外，HVR 中搜索和插入操作的延迟大约为每个节点 2-3 个周期。评估结果显示，平均冲突率约为 0.1％，导致几乎没有延迟开销（≤0.05％），并且没有准确性损失，因为冲突只会导致多余的访问而不会改变图遍历路径。&lt;/p&gt;
+ ]]></description>
+        </item>
+        <item>
+            <guid isPermalink="true">https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/</guid>
+            <title>Product Quantization</title>
+            <link>https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/</link>
+            <category term="ANNS" scheme="https://yyuuz.github.io/tags/ANNS/" />
+            <pubDate>Thu, 01 Aug 2024 00:00:00 +0800</pubDate>
+            <description><![CDATA[ &lt;h2 id=&#34;分治-quantization&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#分治-quantization&#34;&gt;#&lt;/a&gt; 分治 Quantization&lt;/h2&gt;
+&lt;p&gt;PQ 算法把 D 维向量分成 m 组， 每组进行 Kmeans 聚类算法&lt;br /&gt;
+带来的好处&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;m 组子向量的 Kmeans 算法可以并行求解&lt;/li&gt;
+&lt;li&gt;表示空间增大， K 的 m 次方&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;图示pq算法生成码本与量化的过程&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#图示pq算法生成码本与量化的过程&#34;&gt;#&lt;/a&gt; 图示 PQ 算法生成码本与量化的过程&lt;/h2&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225855.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;SDC 的计算流示意图&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225902.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;ADC 的计算流程 示意图&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225909.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;SDC 与 ADC 的整体复杂度为 O (N*m)， 此时的近邻计算是对整体的 N 来计算，实际中的 N 在现实应用中可能在千万量级以上， 虽然相较于暴力计算已经减少了计算量， 但计算量依然很大 并不实用。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;IVFPQ&lt;/strong&gt;&lt;br /&gt;
+ 找 query 的 topk 最近邻， 不用对整个数据集 N 做计算， 只需要对 “有潜力” 的候选进行计算， 可以通过聚类的方式， 先找到 top 的 cluster， 然后对 cluster 内的数据点一次计算距离&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;coarse quantizer，粗粒度量化器，在原始的向量空间中，基于 kmeans 聚类出 k&#39; 个簇 cluster, k&#39; 的大小一般为 sqrt (n),&lt;/li&gt;
+&lt;li&gt;实用 PQ 对 cluster 内的数据点进行量化，PQ 并不是直接在原始数据上做，而是经过第 1 层量化后，计算出每个数据与其量化中心的残差后，对这个残差数据集进行 PQ 量化。用 PQ 处理残差，而不是原始数据的原因是残差的方差或者能量比原始数据的方差或者能量要小&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225916.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;query 查询 topk 近邻时， 选定的粗聚类中心不一定是 1 个， 可以是多个， 比如 k&#39;&#39;, 朴素的 ADC 算法的复杂度是 O (n×m)，而 IVFADC 算法的复杂度会降低为 O ((N×k&#39;&#39;/k&#39;)×m)。&lt;/p&gt;
+ ]]></description>
+        </item>
+        <item>
+            <guid isPermalink="true">https://yyuuz.github.io/2024/08/01/ANNS/SONG/</guid>
+            <title>SONG</title>
+            <link>https://yyuuz.github.io/2024/08/01/ANNS/SONG/</link>
+            <category term="ANNS/搜索" scheme="https://yyuuz.github.io/tags/ANNS-%E6%90%9C%E7%B4%A2/" />
+            <category term="ANNS/GPU" scheme="https://yyuuz.github.io/tags/ANNS-GPU/" />
+            <pubDate>Thu, 01 Aug 2024 00:00:00 +0800</pubDate>
+            <description><![CDATA[ &lt;p&gt;SONG: Approximate Nearest Neighbor Search on GPU&lt;/p&gt;
+&lt;h1 id=&#34;原anns搜索过程&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#原anns搜索过程&#34;&gt;#&lt;/a&gt; 原 ANNS 搜索过程&lt;/h1&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809121502.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;维护三个数据结构 q: 候选集 topk: 结果集 visited: 已访问节点&lt;/p&gt;
+&lt;h1 id=&#34;song系统&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#song系统&#34;&gt;#&lt;/a&gt; SONG 系统&lt;/h1&gt;
+&lt;p&gt;将上述算法全部迁移到了 GPU 中来运行。如图所示为 SONG 系统的处理流程梗概。在每轮迭代中，首先将用于拓展的结点（即需要计算距离的结点）从 GPU 的 Global memory 中存储的图数据中复制到共享内存中（Candidate Locating），随后，多个 GPU 中的 warp（32 个线程）并行地计算这些结点到查询点的距离（Bulk Distance Computation），并将计算得到的结果存到共享内存中。最后，一个 warp 中的其中一个线程使用计算得到的距离数值修改算法中提到的 q，topk，visited 三个数据结构。&lt;br /&gt;
+&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809121525.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;h1 id=&#34;优化&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#优化&#34;&gt;#&lt;/a&gt; 优化&lt;/h1&gt;
+&lt;h2 id=&#34;固定点的度数&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#固定点的度数&#34;&gt;#&lt;/a&gt; 固定点的度数&lt;/h2&gt;
+&lt;p&gt;更好寻址&lt;/p&gt;
+&lt;h2 id=&#34;bloom-filter&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#bloom-filter&#34;&gt;#&lt;/a&gt; [[Bloom filter]]&lt;/h2&gt;
+&lt;p&gt;访问列表不必精确回答 —— 假阳性是可以容忍的（ 已访问告知我们某个元素已被访问，但实际上并没有 ）&lt;/p&gt;
+&lt;h2 id=&#34;有界优先队列&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#有界优先队列&#34;&gt;#&lt;/a&gt; 有界优先队列&lt;/h2&gt;
+&lt;p&gt;只需维护优先队列前 K 个，实现了对称最小 - 最大堆的 GPU 版本&lt;br /&gt;
+&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809121536.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;h2 id=&#34;选择性插入优化&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#选择性插入优化&#34;&gt;#&lt;/a&gt; 选择性插入优化&lt;/h2&gt;
+&lt;p&gt;减少哈希表和布隆过滤器的插入以减少内存消耗 在插入之前进行选择：过滤掉所有与前 K 个元素的距离较大的顶点 —— 只有当一个顶点位于当前与查询点距离最近的前 K 个顶点中时，它才会被标记为已访问并推入 q 中&lt;/p&gt;
+&lt;h2 id=&#34;访问删除优化&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#访问删除优化&#34;&gt;#&lt;/a&gt; 访问删除优化&lt;/h2&gt;
+&lt;p&gt;当一个顶点从优先队列 q 中提取并处理后，如果该顶点没有更新 topk，我们可以将其从访问过的列表中删除。同样，当 topk 被更新时，弹出的顶点也可以从访问过的哈希表中删除。 当应用访问删除优化时，哈希表访问过的顶点恰好是 q（大小最多为 K）和 topk（大小最多为 K）的并集。因此，访问过的顶点的大小被限制在 2K 之内。&lt;/p&gt;
+&lt;h2 id=&#34;距离计算&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#距离计算&#34;&gt;#&lt;/a&gt; 距离计算&lt;/h2&gt;
+&lt;p&gt;每个线程负责计算一个维度子集的部分距离。 32 个线程被组织在一起以访问连续的内存地址。如果我们并发处理候选者，则每个线程的内访问模式是独立的 —— 将产生更多的缓存 miss。&lt;/p&gt;
+&lt;h2 id=&#34;超出gpu内存数据集的问题&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#超出gpu内存数据集的问题&#34;&gt;#&lt;/a&gt; 超出 GPU 内存数据集的问题&lt;/h2&gt;
+&lt;h3 id=&#34;使用随机哈希技术&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#使用随机哈希技术&#34;&gt;#&lt;/a&gt; 使用随机哈希技术&lt;/h3&gt;
+&lt;p&gt;为此，采用了随机哈希技术，将高维数据编码为位向量。这样，哈希后的数据集可以适应 GPU 内存，并在低维位上计算距离。&lt;/p&gt;
+&lt;h3 id=&#34;1-bit随机投影&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#1-bit随机投影&#34;&gt;#&lt;/a&gt; 1-bit 随机投影&lt;/h3&gt;
+&lt;p&gt;在众多概率哈希方法中，本文重点介绍了一种名为 “1-bit 随机投影” 的方法。这种方法通过生成一个随机向量 r ，并计算数据向量 u 和 v 在 r 上的投影符号来进行哈希。公式如下：&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;katex-display&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34; display=&#34;block&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;P&lt;/mi&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mtext&gt;⁡&lt;/mtext&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;s&lt;/mi&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mo&gt;⋅&lt;/mo&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;s&lt;/mi&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;v&lt;/mi&gt;&lt;mo&gt;⋅&lt;/mo&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;θ&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mo separator=&#34;true&#34;&gt;,&lt;/mo&gt;&lt;mi&gt;v&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;mi&gt;π&lt;/mi&gt;&lt;/mfrac&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;Pr⁡(sgn(u⋅r)=sgn(v⋅r))= 1 - \frac{\theta(u,v)}{\pi} 
+&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.13889em;&#34;&gt;P&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;⁡&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;s&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;g&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;⋅&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;s&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;g&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;⋅&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;))&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.7278em;vertical-align:-0.0833em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;−&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:2.113em;vertical-align:-0.686em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mopen nulldelimiter&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mfrac&#34;&gt;&lt;span class=&#34;vlist-t vlist-t2&#34;&gt;&lt;span class=&#34;vlist-r&#34;&gt;&lt;span class=&#34;vlist&#34; style=&#34;height:1.427em;&#34;&gt;&lt;span style=&#34;top:-2.314em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:3em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;π&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;top:-3.23em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:3em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;frac-line&#34; style=&#34;border-bottom-width:0.04em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;top:-3.677em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:3em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;θ&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;mpunct&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.1667em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;vlist-s&#34;&gt;​&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;vlist-r&#34;&gt;&lt;span class=&#34;vlist&#34; style=&#34;height:0.686em;&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;mclose nulldelimiter&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;其中，θ(u,v) 是向量 u 和 v 之间的角度。如果 r 的条目从独立同分布的柯西分布中采样，而不是正态分布，则这种碰撞概率与 χ2 相似度密切相关。&lt;/p&gt;
+&lt;h3 id=&#34;哈希后的数据处理&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#哈希后的数据处理&#34;&gt;#&lt;/a&gt; 哈希后的数据处理&lt;/h3&gt;
+&lt;p&gt;对于每个数据点，映射到一个 h 位向量中。位向量之间的汉明距离是原始数据中相似性的良好估计。在实现中， h 可以设置为 32 的倍数，以便将位向量存储为几个 32 位无符号整数。这样，一个 h 位向量的内存占用等同于 h/32 个单精度浮点值的空间。&lt;/p&gt;
+ ]]></description>
+        </item>
+    </channel>
+</rss>

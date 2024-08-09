@@ -1,0 +1,143 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=2"/><meta name="theme-color" content="#222"/><meta http-equiv="X-UA-COMPATIBLE" content="IE=edge,chrome=1"/><meta name="renderer" content="webkit"/><link rel="icon" type="image/ico" sizes="32x32" href="/assets/favicon.ico"/><link rel="apple-touch-icon" sizes="180x180" href="/assets/apple-touch-icon.png"/><link rel="alternate" href="/rss.xml" title="null" type="application/rss+xml"><link rel="alternate" href="/atom.xml" title="null" type="application/atom+xml"><link rel="alternate" type="application/json" href="https://yyuuz.github.io/feed.json"/><link rel="preconnect" href="https://s4.zstatic.net"/><link rel="preconnect" href="https://at.alicdn.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Mulish:400,400italic,700,700italic%7CFredericka%20the%20Great:400,400italic,700,700italic%7CNoto%20Serif%20JP:400,400italic,700,700italic%7CNoto%20Serif%20SC:400,400italic,700,700italic%7CInconsolata:400,400italic,700,700italic&display=swap&subset=latin,latin-ext" media="none" onload="this.media&#x3D;&#39;all&#39;"><link rel="stylesheet" href="/css/app.css?v=0.4.11"><link rel="modulepreload" href="/js/chunk-KFAQDJFJ.js"></link><link rel="modulepreload" href="/js/chunk-M2OVB55D.js"></link><link rel="modulepreload" href="/js/chunk-UTAXWIXS.js"></link><link rel="modulepreload" href="/js/copy-tex-XTQMO5ME.js"></link><link rel="modulepreload" href="/js/index.esm-AFMI35O5.js"></link><link rel="modulepreload" href="/js/post-S4Q3RLNG.js"></link><link rel="modulepreload" href="/js/quicklink-JMT3KAF7.js"></link><link rel="modulepreload" href="/js/siteInit.js"></link><link rel="preload" href="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(62).webp" as="image" fetchpriority="high"><link rel="preload" href="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(22).webp" as="image" fetchpriority="high"><link rel="preload" href="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(54).webp" as="image" fetchpriority="high"><link rel="preload" href="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(28).webp" as="image" fetchpriority="high"><link rel="preload" href="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(41).webp" as="image" fetchpriority="high"><link rel="preload" href="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(59).webp" as="image" fetchpriority="high"><meta name="keywords" content="ANNS/GPU,HNSW"/><link rel="canonical" href="https://yyuuz.github.io/2024/08/09/ANNS/%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84ANNS%E6%9E%84%E5%BB%BA%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3/"><title>基于图的ANNS构建索引相关</title><meta name="generator" content="Hexo 7.3.0"></head><body itemscope itemtype="http://schema.org/WebPage"><div id="loading"><div class="cat"><div class="body"></div><div class="head"><div class="face"></div></div><div class="foot"><div class="tummy-end"></div><div class="bottom"></div><div class="legs left"></div><div class="legs right"></div></div><div class="paw"><div class="hands left"></div><div class="hands right"></div></div></div></div><div id="container"><header id="header" itemscope itemtype="http://schema.org/WPHeader"><div class="inner"><div id="brand"><div class="pjax"><h1 itemprop="name headline">基于图的ANNS构建索引相关</h1><div class="meta"><span class="item" title="创建时间：2024-08-09 00:00:00"><span class="icon"><i class="ic i-calendar"></i></span><span class="text">发表于</span><time itemprop="dateCreated datePublished" datetime="2024-08-09T00:00:00+08:00">2024-08-09</time></span><span class="item" title="本文字数"><span class="icon"><i class="ic i-pen"></i></span><span class="text">本文字数</span><span>2.8k</span><span class="text">字</span></span><span class="item" title="阅读时长"><span class="icon"><i class="ic i-clock"></i></span><span class="text">阅读时长</span><span>3 分钟</span></span></div></div></div><nav id="nav"><div class="inner"><div class="toggle"><div class="lines" aria-label="切换导航栏"><span class="line"></span><span class="line"></span><span class="line"></span></div></div><ul class="menu"><li class="item title"><a href="/" rel="start">Yyuuz's Wasteland</a></li></ul><ul class="right" id="rightNav"><li class="item theme"><i class="ic i-sun"></i></li><li class="item search"><i class="ic i-search"></i></li></ul></div></nav></div><div class="pjax" id="imgs"><ul><li class="item" style="background-image: url(&quot;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(62).webp&quot;);"></li><li class="item" style="background-image: url(&quot;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(22).webp&quot;);"></li><li class="item" style="background-image: url(&quot;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(54).webp&quot;);"></li><li class="item" style="background-image: url(&quot;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(28).webp&quot;);"></li><li class="item" style="background-image: url(&quot;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(41).webp&quot;);"></li><li class="item" style="background-image: url(&quot;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/shokax/img(59).webp&quot;);"></li></ul></div></header><div id="waves"><svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto"><defs><path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z"></path></defs><g class="parallax"><use xlink:href="#gentle-wave" x="48" y="0"></use><use xlink:href="#gentle-wave" x="48" y="3"></use><use xlink:href="#gentle-wave" x="48" y="5"></use><use xlink:href="#gentle-wave" x="48" y="7"></use></g></svg></div><main><div class="inner"><div class="pjax" id="main"><div class="article wrap"><div class="breadcrumb" itemListElement itemscope itemtype="https://schema.org/BreadcrumbList"><i class="ic i-home"></i><span><a href="/">首页</a></span><i class="ic i-angle-right"></i><span class="current" itemprop="itemListElement" itemscope="itemscope" itemtype="https://schema.org/ListItem"><a href="/categories/ANNS/" itemprop="item" rel="index" title="分类于ANNS"><span itemprop="name">ANNS<meta itemprop="position" content="0"/></span></a></span></div><article class="post block" itemscope="itemscope" itemtype="http://schema.org/Article" lang="zh-CN"><link itemprop="mainEntityOfPage" href="https://yyuuz.github.io/2024/08/09/ANNS/%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84ANNS%E6%9E%84%E5%BB%BA%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3/"/><span hidden="hidden" itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person"><meta itemprop="image" content="/assets/avatar.webp"/><meta itemprop="name" content="GuitarYui"/><meta itemprop="description" content="In a champagne supernova in the sky, "/></span><span hidden="hidden" itemprop="publisher" itemscope="itemscope" itemtype="http://schema.org/Organization"><meta itemprop="name"/></span><div class="body md" itemprop="articleBody"><p>基础的索引构建算法</p>
+<h1 id="knn图"><a class="anchor" href="#knn图">#</a> KNN 图</h1>
+<h2 id="nn-descent"><a class="anchor" href="#nn-descent">#</a> <a target="_blank" rel="noopener" href="https://blog.csdn.net/whenever5225/article/details/105598694">NN-Descent</a></h2>
+<h2 id="nn-descentfull"><a class="anchor" href="#nn-descentfull">#</a> <a target="_blank" rel="noopener" href="https://lsyhprum.github.io/2021/07/01/NN-Descent%E8%AE%BA%E6%96%87%E6%B5%85%E6%9E%90/">NN-DescentFULL</a></h2>
+<h1 id="nsw"><a class="anchor" href="#nsw">#</a> NSW</h1>
+<p>找到节点𝑣𝑖最近邻的 𝑓 个邻居，建立𝑣𝑖和这些邻居的边连接</p>
+<h1 id="hnsw"><a class="anchor" href="#hnsw">#</a> HNSW</h1>
+<p><img loading="lazy" data-src="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230011.png" alt="image.png" /></p>
+<p>确定一个 I,p 从 0 到 I 都会出现<br />
+<img loading="lazy" data-src="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230019.png" alt="image.png" /></p>
+<p>第一阶段：从顶层到第 I+1 层遍历，ef=1，ep = 唯一找到的点；<br />
+ 第二阶段：<br />
+9. 从第 I 层到 0 层遍历，ef,ep=w (ef 个最近邻节点的集合)<br />
+<img loading="lazy" data-src="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230102.png" alt="image.png" /></p>
+<p>10.W 选 M 个节点于 q 连接，两种方法<br />
+<strong> SIMPLE</strong> 的：<br />
+<img loading="lazy" data-src="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230111.png" alt="image.png" /></p>
+<p>直接选最近的<br />
+<strong> HEURISTIC</strong> 的：<br />
+<img loading="lazy" data-src="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230118.png" alt="image.png" /></p>
+<p>要连接的点 p1（p1，q) 要比（所有？还是只需一个？应该是所有）原有的连接点 p2，(p1,p2) 小才允许连接，（p1，q)&lt;(p1,p2)<br />
+<strong> 为了在不同方向上选择邻居，从而避免邻居扎堆 “高速公路”</strong><br />
+ 最后检查连接的邻居，用上面的算法缩减它们的邻居个数至 Wmax</p>
+<h1 id="gpu-accelerated-proximity-graph-approximate-nearest-neighbor-search-and-construction"><a class="anchor" href="#gpu-accelerated-proximity-graph-approximate-nearest-neighbor-search-and-construction">#</a> GPU-accelerated Proximity Graph Approximate Nearest Neighbor Search and Construction</h1>
+<h2 id="构建nsg图"><a class="anchor" href="#构建nsg图">#</a> 构建 NSG 图</h2>
+<p><img loading="lazy" data-src="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230131.png" alt="image.png" /></p>
+<p>这个算法是一个基于 GPU 的近邻搜索图（NSW，Navigable Small World Graph）构建算法。该算法旨在通过平行处理来构建一个包含点集合的近邻图，其中每个节点的度数在指定的最小度数 (d_{min}) 和最大度数 (d_{max}) 之间。具体步骤如下：</p>
+<h3 id="输入"><a class="anchor" href="#输入">#</a> 输入：</h3>
+<ul>
+<li><strong>P</strong>: 一个点的集合。</li>
+<li><strong>(d_{min})</strong>: 图中节点的最小度数。</li>
+<li><strong>(d_{max})</strong>: 图中节点的最大度数。</li>
+</ul>
+<h3 id="输出"><a class="anchor" href="#输出">#</a> 输出：</h3>
+<ul>
+<li><strong>G</strong>: 一个近邻图 (G = (V, E))，包含节点集 (V) 和边集 (E)。</li>
+</ul>
+<h3 id="步骤"><a class="anchor" href="#步骤">#</a> 步骤：</h3>
+<ol>
+<li><strong>划分点集合</strong>：
+<ul>
+<li>将点集合 (P) 划分为互不相交的子集 (P_0, P_1, \ldots, P_t)。</li>
+</ul>
+</li>
+<li><strong>初始化图子集</strong>：
+<ul>
+<li>并行（跨 GPU 块）初始化每个划分 (P_i) 的空图子集 (G_i)。</li>
+</ul>
+</li>
+<li><strong>局部邻居搜索和更新</strong>：
+<ul>
+<li>对于划分 (P_i) 中的每个点 (v_{ij})：
+<ul>
+<li>在局部图子集 (G_i) 中找到初始邻居 (v_{ij}.N) 和 (v_{ij}.N')，确保度数不少于 (d_{min})。</li>
+<li>对于 (v_{ij}) 的每个邻居 (u_{ij})：
+<ul>
+<li>在块内并行，将 (v_{ij}) 添加到 (u_{ij}) 的邻居中。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>全局邻居搜索和更新</strong>：
+<ul>
+<li>对于每个划分 (i) 从 1 到 (t)：
+<ul>
+<li>初始化空边集 (E) 和索引集 (I)。</li>
+<li>并行（跨 GPU 块）处理 (G_i) 中的每个点 (v_{ij})：
+<ul>
+<li>更新 (v_{ij}.N)，通过搜索全局图 (G_0) 确保度数不少于 (d_{min})。</li>
+<li>在块内并行，将 (v_{ij}.N) 与 (v_{ij}.N') 合并。</li>
+<li>对于 (v_{ij}) 的每个邻居 (u_{ij})：
+<ul>
+<li>在块内并行，将边 ((u_{ij} \rightarrow v_{ij}, \delta (u_{ij}, v_{ij}))) 添加到 (E) 中。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>并行（跨 GPU 块）执行 gather-scatter 操作以更新 (E) 和 (I)。</li>
+<li>并行（跨和块内）更新 (u_{ij}) 的邻居，包含从 (E) 中收集的新边。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><strong>返回最终图</strong>：
+<ul>
+<li>返回全局图 (G_0)，它现在表示包含更新后的边和邻居的完整近邻图。</li>
+</ul>
+</li>
+</ol>
+<h3 id="总结"><a class="anchor" href="#总结">#</a> 总结：</h3>
+<p>该算法有效地利用 GPU 的并行处理能力对点集进行划分、执行局部和全局邻居搜索，并更新图结构。这种方法确保在构建近邻图的同时维持节点度数的约束 (d_{min}) 和 (d_{max})。</p>
+<h3 id="关键概念"><a class="anchor" href="#关键概念">#</a> 关键概念：</h3>
+<ul>
+<li><strong>并行处理</strong>：利用 GPU 块和线程并行执行操作，加速计算过程。</li>
+<li><strong>邻居搜索</strong>：为每个点找到并更新邻居以构建图。</li>
+<li><strong>Gather-Scatter 操作</strong>：一种高效分布和收集数据的并行技术。</li>
+</ul>
+<h3 id="后向边更新"><a class="anchor" href="#后向边更新">#</a> 后向边更新</h3>
+<blockquote>
+<p><strong>前向边</strong>：u 先插入，v 后插入，v 发出 knn 搜索，v-&gt;u 是前向边<br />
+ ** 后向边：**v 先插入，u 后插入，u 发出 knn 搜索，v-&gt;u 是后向边</p>
+</blockquote>
+<p>合并子图时，算法 12-14 行，更新了前向边，但是后向边更新时可能两个 vij 同时搜索到一个点 u，所以先把距离记录到 CSR 表中<br />
+ [[双调排序]]</p>
+<p><img loading="lazy" data-src="https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230210.png" alt="image.png" /></p>
+<h1 id="fast-k-nn-graph-construction-by-gpu-based-nn-descent"><a class="anchor" href="#fast-k-nn-graph-construction-by-gpu-based-nn-descent">#</a> <strong>Fast k-NN graph construction by GPU based NN-Descent</strong></h1>
+<div class="tags"><a href="/tags/ANNS-GPU/" rel="tag"><i class="ic i-tag"></i>ANNS/GPU</a><a href="/tags/ANNS-%E7%B4%A2%E5%BC%95/" rel="tag"><i class="ic i-tag"></i>ANNS/索引</a><a href="/tags/HNSW/" rel="tag"><i class="ic i-tag"></i>HNSW</a></div></div><footer><div class="meta"><span class="item"><span class="icon"><i class="ic i-calendar-check"></i></span><span class="text">更新于</span><time title="修改时间：2024-08-09 00:11:08" itemprop="dateModified" datetime="2024-08-09T00:11:08+08:00">2024-08-09</time></span></div><div class="reward"><button><i class="ic i-heartbeat"></i>赞赏</button><p>请我喝[茶]~(￣▽￣)~*</p><div id="qr"><div><img loading="lazy" data-src="/assets/wechatpay.png" alt="GuitarYui 微信支付"/><p>微信支付</p></div><div><img loading="lazy" data-src="/assets/alipay.png" alt="GuitarYui 支付宝"/><p>支付宝</p></div></div></div><div id="copyright"><ul><li class="author"><strong>本文作者：</strong>GuitarYui<i class="ic i-at"><em>@</em></i></li><li class="link"><strong>本文链接：</strong><a href="https://yyuuz.github.io/2024/08/09/ANNS/%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84ANNS%E6%9E%84%E5%BB%BA%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3/" title="基于图的ANNS构建索引相关">https://yyuuz.github.io/2024/08/09/ANNS/基于图的ANNS构建索引相关/</a></li><li class="license"><strong>版权声明：</strong>本站所有文章除特别声明外，均采用 <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh"><i class="ic i-creative-commons"><em>(CC)</em></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li></ul></div></footer></article></div><div class="post-nav"><div class="item left"><a href="/2024/08/01/ANNS/DF-GAS_%20a%20Distributed%20FPGA-as-a-Service%20Architecture%20towards%20Billion-Scale%20Graph-based%20Approximate%20Nearest%20Neighbor%20Search/" rel="prev" itemprop="url" data-background-image="https:&#x2F;&#x2F;pichost-yu.oss-cn-wuhan-lr.aliyuncs.com&#x2F;shokax&#x2F;img(16).webp" title="DF-GAS_ a Distributed FPGA-as-a-Service Architecture towards Billion-Scale Graph-based Approximate Nearest Neighbor Search"><span class="type">上一篇</span><span class="category"><i class="ic i-flag"></i>ANNS</span><h3>DF-GAS_ a Distributed FPGA-as-a-Service Architecture towards Billion-Scale Graph-based Approximate Nearest Neighbor Search</h3></a></div><div class="item right"><a href="/2024/08/09/ANNS/CXL-ANNS/" rel="next" itemprop="url" data-background-image="https:&#x2F;&#x2F;pichost-yu.oss-cn-wuhan-lr.aliyuncs.com&#x2F;shokax&#x2F;img(69).webp" title="CXL-ANNS"><span class="type">下一篇</span><span class="category"><i class="ic i-flag"></i>ANNS</span><h3>CXL-ANNS</h3></a></div></div><div class="wrap" id="comments"></div></div><div id="sidebar"><div class="inner"><div class="panels"><div class="inner"><div class="contents panel pjax" data-title="文章目录"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#knn%E5%9B%BE"><span class="toc-number">1.</span> <span class="toc-text"> KNN 图</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#nn-descent"><span class="toc-number">1.1.</span> <span class="toc-text"> NN-Descent</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#nn-descentfull"><span class="toc-number">1.2.</span> <span class="toc-text"> NN-DescentFULL</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#nsw"><span class="toc-number">2.</span> <span class="toc-text"> NSW</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#hnsw"><span class="toc-number">3.</span> <span class="toc-text"> HNSW</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#gpu-accelerated-proximity-graph-approximate-nearest-neighbor-search-and-construction"><span class="toc-number">4.</span> <span class="toc-text"> GPU-accelerated Proximity Graph Approximate Nearest Neighbor Search and Construction</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%84%E5%BB%BAnsg%E5%9B%BE"><span class="toc-number">4.1.</span> <span class="toc-text"> 构建 NSG 图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BE%93%E5%85%A5"><span class="toc-number">4.1.1.</span> <span class="toc-text"> 输入：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BE%93%E5%87%BA"><span class="toc-number">4.1.2.</span> <span class="toc-text"> 输出：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4"><span class="toc-number">4.1.3.</span> <span class="toc-text"> 步骤：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.1.4.</span> <span class="toc-text"> 总结：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E6%A6%82%E5%BF%B5"><span class="toc-number">4.1.5.</span> <span class="toc-text"> 关键概念：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E5%90%91%E8%BE%B9%E6%9B%B4%E6%96%B0"><span class="toc-number">4.1.6.</span> <span class="toc-text"> 后向边更新</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#fast-k-nn-graph-construction-by-gpu-based-nn-descent"><span class="toc-number">5.</span> <span class="toc-text"> Fast k-NN graph construction by GPU based NN-Descent</span></a></li></ol></div><div class="related panel pjax" data-title="系列文章"><ul><li ><a href="/2024/08/01/ANNS/DF-GAS_%20a%20Distributed%20FPGA-as-a-Service%20Architecture%20towards%20Billion-Scale%20Graph-based%20Approximate%20Nearest%20Neighbor%20Search/" rel="bookmark" title="DF-GAS_ a Distributed FPGA-as-a-Service Architecture towards Billion-Scale Graph-based Approximate Nearest Neighbor Search">DF-GAS_ a Distributed FPGA-as-a-Service Architecture towards Billion-Scale Graph-based Approximate Nearest Neighbor Search</a></li><li ><a href="/2024/08/09/ANNS/CXL-ANNS/" rel="bookmark" title="CXL-ANNS">CXL-ANNS</a></li><li  class="active"><a href="/2024/08/09/ANNS/%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84ANNS%E6%9E%84%E5%BB%BA%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3/" rel="bookmark" title="基于图的ANNS构建索引相关">基于图的ANNS构建索引相关</a></li></ul></div><div class="overview panel" data-title="站点概览"><div class="author" itemprop="author" itemscope="itemscope" itemtype="http://schema.org/Person"><img class="image" loading="lazy" decoding="async" itemprop="image" alt="GuitarYui" src="/assets/avatar.webp"/><p class="name" itemprop="name">GuitarYui</p><div class="description" itemprop="description"></div></div><nav class="state"><div class="item posts"><a href="/archives/"><span class="count">5</span><span class="name">文章</span></a></div><div class="item categories"><a href="/categories/"><span class="count">1</span><span class="name">分类</span></a></div><div class="item tags"><a href="/tags/"><span class="count">7</span><span class="name">标签</span></a></div></nav><div class="social"><a target="_blank" rel="noopener" href="https://github.com/yyuuz" class="item github" title="https:&#x2F;&#x2F;github.com&#x2F;yyuuz"><i class="ic i-github"></i></a><a target="_blank" rel="noopener" href="https://music.163.com/#/user/home?id=1658614535" class="item music" title="https:&#x2F;&#x2F;music.163.com&#x2F;#&#x2F;user&#x2F;home?id&#x3D;1658614535"><i class="ic i-cloud-music"></i></a><a target="_blank" rel="noopener" href="https://steamcommunity.com/profiles/76561199098627022/" class="item steam" title="https:&#x2F;&#x2F;steamcommunity.com&#x2F;profiles&#x2F;76561199098627022&#x2F;"><i class="ic i-steam"></i></a></div><div class="menu"><li class="item"><a href="/" rel="section"><i class="ic i-home"></i>首页</a></li></div></div></div></div><ul id="quick"><li class="prev pjax"><a href="/2024/08/09/ANNS/CXL-ANNS/" rel="prev" title="上一篇"><i class="ic i-chevron-left"></i></a></li><li class="up"><i class="ic i-arrow-up"></i></li><li class="down"><i class="ic i-arrow-down"></i></li><li class="next pjax"><a href="/2024/08/01/ANNS/DF-GAS_%20a%20Distributed%20FPGA-as-a-Service%20Architecture%20towards%20Billion-Scale%20Graph-based%20Approximate%20Nearest%20Neighbor%20Search/" rel="next" title="下一篇"><i class="ic i-chevron-right"></i></a></li><li class="percent"></li></ul></div></div><div class="dimmer"></div></div></main><footer id="footer"><div class="inner"><div class="widgets"><div class="rpost pjax"><h2>随机文章</h2><ul><li class="item"><div class="breadcrumb"><a href="/categories/ANNS/" title="分类于ANNS">ANNS</a></div><span><a href="/2024/08/09/ANNS/CXL-ANNS/">CXL-ANNS</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/ANNS/" title="分类于ANNS">ANNS</a></div><span><a href="/2024/08/09/ANNS/%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84ANNS%E6%9E%84%E5%BB%BA%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3/">基于图的ANNS构建索引相关</a></span></li><li class="item"><div class="breadcrumb"></div><span><a href="/2024/08/01/ANNS/Product%20Quantization/">Product Quantization</a></span></li><li class="item"><div class="breadcrumb"></div><span><a href="/2024/08/01/ANNS/SONG/">SONG</a></span></li><li class="item"><div class="breadcrumb"><a href="/categories/ANNS/" title="分类于ANNS">ANNS</a></div><span><a href="/2024/08/01/ANNS/DF-GAS_%20a%20Distributed%20FPGA-as-a-Service%20Architecture%20towards%20Billion-Scale%20Graph-based%20Approximate%20Nearest%20Neighbor%20Search/">DF-GAS_ a Distributed FPGA-as-a-Service Architecture towards Billion-Scale Graph-based Approximate Nearest Neighbor Search</a></span></li></ul></div><div class="rpost pjax"><h2>最新评论</h2></div></div><div class="status"><div class="copyright">&copy; 2022 -<span itemprop="copyrightYear">2024</span><span class="with-love"><i class="ic i-sakura rotate"></i></span><span class="author" itemprop="copyrightHolder">GuitarYui @ Yyuuz's Wasteland</span></div><div class="count"><span class="post-meta-item-icon"><i class="ic i-chart-area"></i></span><span title="站点总字数">16k 字</span><span class="post-meta-divider"> | </span><span class="post-meta-item-icon"><i class="ic i-coffee"></i></span><span title="站点阅读时长">15 分钟</span></div><div class="powered-by">基于 <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & Theme.<a target="_blank" rel="noopener" href="https://github.com/theme-shoka-x/hexo-theme-shokaX/">ShokaX</a></div></div></div></footer></div><script data-config type="text/javascript">var LOCAL = {
+    ispost: true,
+        path: `2024/08/09/ANNS/基于图的ANNS构建索引相关/`,
+        favicon: {
+        show: `（●´3｀●）やれやれだぜ`,
+        hide: `(´Д｀)大変だ！`
+    },
+    search: {
+        placeholder: "文章搜索",
+        empty: "关于 「 ${query} 」，什么也没搜到",
+        stats: "${time} ms 内找到 ${hits} 条结果"
+    },
+    copy_tex: false,
+    katex: false,
+    mermaid: false,
+    audio: undefined,
+    fancybox: true,
+    nocopy: false,
+    outime: true,
+    template: `<div class="note warning"><p><span class="label warning">文章时效性提示</span><br>这是一篇发布于 {{publish}} 天前，最后一次更新在 {{updated}} 天前的文章，部分信息可能已经发生改变，请注意甄别。</p></div>`,
+    quiz: {
+        choice: `单选题`,
+        multiple: `多选题`,
+        true_false: `判断题`,
+        essay: `问答题`,
+        gap_fill: `填空题`,
+        mistake: `错题备注`
+    },
+    ignores: [
+        (uri) => uri.includes('#'),
+        (uri) => new RegExp(LOCAL.path + '$').test(uri),
+            []
+    ]
+};
+</script><script src="https://s4.zstatic.net/ajax/libs/pace/1.2.4/pace.min.js" integrity="sha384-k6YtvFUEIuEFBdrLKJ3YAUbBki333tj1CSUisai5Cswsg9wcLNaPzsTHDswp4Az8" crossorigin="anonymous" fetchpriority="high"></script><script src="https://s4.zstatic.net/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha384-ZvpUoO&#x2F;+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn&#x2F;6Z&#x2F;hRTt8+pR6L4N2" crossorigin="anonymous" fetchpriority="high"></script><script src="/js/siteInit.js?v=0.4.11" type="module" fetchpriority="high" defer></script></body></html>
