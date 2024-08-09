@@ -512,6 +512,7 @@ Cand update:cpu累加子距离并排序更新
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225916.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;query 查询 topk 近邻时， 选定的粗聚类中心不一定是 1 个， 可以是多个， 比如 k&#39;&#39;, 朴素的 ADC 算法的复杂度是 O (n×m)，而 IVFADC 算法的复杂度会降低为 O ((N×k&#39;&#39;/k&#39;)×m)。&lt;/p&gt;
 </content>
+        <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
         <category term="ANNS" scheme="https://yyuuz.github.io/tags/ANNS/" />
         <updated>2024-07-31T16:00:00.000Z</updated>
     </entry>
@@ -551,6 +552,7 @@ Cand update:cpu累加子距离并排序更新
 &lt;h3 id=&#34;哈希后的数据处理&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#哈希后的数据处理&#34;&gt;#&lt;/a&gt; 哈希后的数据处理&lt;/h3&gt;
 &lt;p&gt;对于每个数据点，映射到一个 h 位向量中。位向量之间的汉明距离是原始数据中相似性的良好估计。在实现中， h 可以设置为 32 的倍数，以便将位向量存储为几个 32 位无符号整数。这样，一个 h 位向量的内存占用等同于 h/32 个单精度浮点值的空间。&lt;/p&gt;
 </content>
+        <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
         <category term="ANNS/搜索" scheme="https://yyuuz.github.io/tags/ANNS-%E6%90%9C%E7%B4%A2/" />
         <category term="ANNS/GPU" scheme="https://yyuuz.github.io/tags/ANNS-GPU/" />
         <updated>2024-07-31T16:00:00.000Z</updated>
