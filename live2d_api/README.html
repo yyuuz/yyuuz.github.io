@@ -1,0 +1,76 @@
+<h1 id="live2d-api"><a class="anchor" href="#live2d-api">#</a> Live2D API</h1>
+<h3 id="目前的模型列表自己修改的"><a class="anchor" href="#目前的模型列表自己修改的">#</a> 目前的模型列表 (自己修改的)</h3>
+<p>potion maker 的 pio 与 tia (可换装)</p>
+<p>小埋</p>
+<p>埃罗芒阿老师里的和泉纱雾</p>
+<p>点兔的香风智乃 (可惜没有🐇🧓)</p>
+<p>unity 娘</p>
+<p>龙女仆里的康娜</p>
+<h3 id="食用教程"><a class="anchor" href="#食用教程">#</a> 食用教程</h3>
+<p><a href="https://yzs020220.github.io/posts/41158/">Hexo 博客添加 live2 看板娘 - 可换装，增删模型</a></p>
+<h2 id="原作者readme内容"><a class="anchor" href="#原作者readme内容">#</a> 原作者 readme 内容</h2>
+<p>Live2D 看板娘插件 (<a href="https://www.fghrsh.net/post/123.html">网页添加 Live2D 看板娘 - FGHRSH 的博客</a>) 上使用的后端 API</p>
+<h3 id="特性"><a class="anchor" href="#特性">#</a> 特性</h3>
+<ul>
+<li>原生 PHP 开发，无需伪静态，开箱即用</li>
+<li>支持 模型、皮肤 的 顺序切换 和 随机切换</li>
+<li>支持 单模型 单皮肤 切换、多组皮肤 递归穷举</li>
+<li>支持 同分组 多个模型 或 多个路径 的 加载切换</li>
+</ul>
+<h2 id="使用"><a class="anchor" href="#使用">#</a> 使用</h2>
+<h3 id="环境要求"><a class="anchor" href="#环境要求">#</a> 环境要求</h3>
+<ul>
+<li>PHP 版本 &gt;= 5.2</li>
+<li>依赖 PHP 扩展：json</li>
+</ul>
+<h3 id="目录结构"><a class="anchor" href="#目录结构">#</a> 目录结构</h3>
+<figure class="highlight shell"><figcaption data-lang="Bash"></figcaption><table><tr><td data-num="1"></td><td><pre>│  model_list.json              // 模型列表</pre></td></tr><tr><td data-num="2"></td><td><pre>│</pre></td></tr><tr><td data-num="3"></td><td><pre>├─model                         // 模型路径</pre></td></tr><tr><td data-num="4"></td><td><pre>│  └─GroupName                  // 模组分组</pre></td></tr><tr><td data-num="5"></td><td><pre>│      └─ModelName              // 模型名称</pre></td></tr><tr><td data-num="6"></td><td><pre>│</pre></td></tr><tr><td data-num="7"></td><td><pre>├─add                           // 更新皮肤列表</pre></td></tr><tr><td data-num="8"></td><td><pre>├─get                           // 获取模型配置</pre></td></tr><tr><td data-num="9"></td><td><pre>├─rand                          // 随机切换模型</pre></td></tr><tr><td data-num="10"></td><td><pre>├─rand_textures                 // 随机切换皮肤</pre></td></tr><tr><td data-num="11"></td><td><pre>├─switch                        // 顺序切换模型</pre></td></tr><tr><td data-num="12"></td><td><pre>├─switch_textures               // 顺序切换皮肤</pre></td></tr><tr><td data-num="13"></td><td><pre>└─tools</pre></td></tr><tr><td data-num="14"></td><td><pre>        modelList.php           // 列出模型列表</pre></td></tr><tr><td data-num="15"></td><td><pre>        modelTextures.php       // 列出皮肤列表</pre></td></tr><tr><td data-num="16"></td><td><pre>        name-to-lower.php       // 文件名格式化</pre></td></tr></table></figure><h3 id="添加模型"><a class="anchor" href="#添加模型">#</a> 添加模型</h3>
+<ul>
+<li>单模型 单皮肤 切换
+<ul>
+<li>单次加载只输出一个皮肤</li>
+<li>皮肤放在  <code>textures</code>  文件夹，自动识别</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight shell"><figcaption data-lang="Bash"></figcaption><table><tr><td data-num="1"></td><td><pre>│  index.json</pre></td></tr><tr><td data-num="2"></td><td><pre>│  model.moc</pre></td></tr><tr><td data-num="3"></td><td><pre>│  textures.cache       // 皮肤列表缓存，自动生成</pre></td></tr><tr><td data-num="4"></td><td><pre>│</pre></td></tr><tr><td data-num="5"></td><td><pre>├─motions</pre></td></tr><tr><td data-num="6"></td><td><pre>│      idle_01.mtn</pre></td></tr><tr><td data-num="7"></td><td><pre>│      idle_02.mtn</pre></td></tr><tr><td data-num="8"></td><td><pre>│      idle_03.mtn</pre></td></tr><tr><td data-num="9"></td><td><pre>│</pre></td></tr><tr><td data-num="10"></td><td><pre>└─textures</pre></td></tr><tr><td data-num="11"></td><td><pre>        default-costume.png</pre></td></tr><tr><td data-num="12"></td><td><pre>        school-costume.png</pre></td></tr><tr><td data-num="13"></td><td><pre>        winter-costume.png</pre></td></tr></table></figure><ul>
+<li>
+<p>单模型 多组皮肤 递归穷举</p>
+<ul>
+<li>
+<p>多组皮肤 组合模型、穷举组合</p>
+</li>
+<li>
+<p>皮肤文件夹按  <code>texture_XX</code>  命名</p>
+</li>
+<li>
+<p>添加  <code>textures_order.json</code>  列出组合</p>
+<figure class="highlight shell"><figcaption data-lang="Bash"></figcaption><table><tr><td data-num="1"></td><td><pre>│  index.json</pre></td></tr><tr><td data-num="2"></td><td><pre>│  model.moc</pre></td></tr><tr><td data-num="3"></td><td><pre>│  textures.cache</pre></td></tr><tr><td data-num="4"></td><td><pre>│  textures_order.json</pre></td></tr><tr><td data-num="5"></td><td><pre>│</pre></td></tr><tr><td data-num="6"></td><td><pre>├─motions</pre></td></tr><tr><td data-num="7"></td><td><pre>│      idle_01.mtn</pre></td></tr><tr><td data-num="8"></td><td><pre>│      idle_02.mtn</pre></td></tr><tr><td data-num="9"></td><td><pre>│      idle_03.mtn</pre></td></tr><tr><td data-num="10"></td><td><pre>│</pre></td></tr><tr><td data-num="11"></td><td><pre>├─texture_00</pre></td></tr><tr><td data-num="12"></td><td><pre>│      00.png</pre></td></tr><tr><td data-num="13"></td><td><pre>│</pre></td></tr><tr><td data-num="14"></td><td><pre>├─texture_01</pre></td></tr><tr><td data-num="15"></td><td><pre>│      00.png</pre></td></tr><tr><td data-num="16"></td><td><pre>│      01.png</pre></td></tr><tr><td data-num="17"></td><td><pre>│      02.png</pre></td></tr><tr><td data-num="18"></td><td><pre>│</pre></td></tr><tr><td data-num="19"></td><td><pre>├─texture_02</pre></td></tr><tr><td data-num="20"></td><td><pre>│      00.png</pre></td></tr><tr><td data-num="21"></td><td><pre>│      01.png</pre></td></tr><tr><td data-num="22"></td><td><pre>│      02.png</pre></td></tr><tr><td data-num="23"></td><td><pre>│</pre></td></tr><tr><td data-num="24"></td><td><pre>└─texture_03</pre></td></tr><tr><td data-num="25"></td><td><pre> 00.png</pre></td></tr><tr><td data-num="26"></td><td><pre> 01.png</pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p>textures_order.json</p>
+<figure class="highlight json"><figcaption data-lang="JSON"></figcaption><table><tr><td data-num="1"></td><td><pre><span class="token punctuation">[</span></pre></td></tr><tr><td data-num="2"></td><td><pre>    <span class="token punctuation">[</span><span class="token string">"texture_00"</span><span class="token punctuation">]</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="3"></td><td><pre>    <span class="token punctuation">[</span><span class="token string">"texture_01"</span><span class="token punctuation">,</span><span class="token string">"texture_02"</span><span class="token punctuation">]</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="4"></td><td><pre>    <span class="token punctuation">[</span><span class="token string">"texture_03"</span><span class="token punctuation">]</span></pre></td></tr><tr><td data-num="5"></td><td><pre><span class="token punctuation">]</span></pre></td></tr></table></figure><p>textures.cache</p>
+<figure class="highlight json"><figcaption data-lang="JSON"></figcaption><table><tr><td data-num="1"></td><td><pre><span class="token punctuation">[</span></pre></td></tr><tr><td data-num="2"></td><td><pre>    <span class="token punctuation">[</span><span class="token string">"texture_00/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_01/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_02/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_03/00.png"</span><span class="token punctuation">]</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="3"></td><td><pre>    <span class="token punctuation">[</span><span class="token string">"texture_00/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_01/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_02/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_03/01.png"</span><span class="token punctuation">]</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="4"></td><td><pre>    <span class="token punctuation">[</span><span class="token string">"texture_00/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_01/01.png"</span><span class="token punctuation">,</span><span class="token string">"texture_02/01.png"</span><span class="token punctuation">,</span><span class="token string">"texture_03/00.png"</span><span class="token punctuation">]</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="5"></td><td><pre>    <span class="token punctuation">[</span><span class="token string">"texture_00/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_01/01.png"</span><span class="token punctuation">,</span><span class="token string">"texture_02/01.png"</span><span class="token punctuation">,</span><span class="token string">"texture_03/01.png"</span><span class="token punctuation">]</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="6"></td><td><pre>    <span class="token punctuation">[</span><span class="token string">"texture_00/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_01/02.png"</span><span class="token punctuation">,</span><span class="token string">"texture_02/02.png"</span><span class="token punctuation">,</span><span class="token string">"texture_03/00.png"</span><span class="token punctuation">]</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="7"></td><td><pre>    <span class="token punctuation">[</span><span class="token string">"texture_00/00.png"</span><span class="token punctuation">,</span><span class="token string">"texture_01/02.png"</span><span class="token punctuation">,</span><span class="token string">"texture_02/02.png"</span><span class="token punctuation">,</span><span class="token string">"texture_03/01.png"</span><span class="token punctuation">]</span></pre></td></tr><tr><td data-num="8"></td><td><pre><span class="token punctuation">]</span></pre></td></tr></table></figure><ul>
+<li>同分组 多个模型 或 多个路径 切换
+<ul>
+<li>修改  <code>model_list.json</code>  添加多个模型</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight shell"><figcaption data-lang="Bash"></figcaption><table><tr><td data-num="1"></td><td><pre>│</pre></td></tr><tr><td data-num="2"></td><td><pre>├─model</pre></td></tr><tr><td data-num="3"></td><td><pre>│  ├─Group1</pre></td></tr><tr><td data-num="4"></td><td><pre>│  │  ├─Model1</pre></td></tr><tr><td data-num="5"></td><td><pre>│  │  │      index.json</pre></td></tr><tr><td data-num="6"></td><td><pre>│  │  │</pre></td></tr><tr><td data-num="7"></td><td><pre>│  │  └─Model2</pre></td></tr><tr><td data-num="8"></td><td><pre>│  │          index.json</pre></td></tr><tr><td data-num="9"></td><td><pre>│  │</pre></td></tr><tr><td data-num="10"></td><td><pre>│  ├─Group2</pre></td></tr><tr><td data-num="11"></td><td><pre>│  │  └─Model1</pre></td></tr><tr><td data-num="12"></td><td><pre>│  │          index.json</pre></td></tr><tr><td data-num="13"></td><td><pre>│  │</pre></td></tr><tr><td data-num="14"></td><td><pre>│  └─GroupName</pre></td></tr><tr><td data-num="15"></td><td><pre>│     └─ModelName</pre></td></tr><tr><td data-num="16"></td><td><pre>│          │  index.json</pre></td></tr><tr><td data-num="17"></td><td><pre>│          │  model.moc</pre></td></tr><tr><td data-num="18"></td><td><pre>│          │</pre></td></tr><tr><td data-num="19"></td><td><pre>│          ├─motions</pre></td></tr><tr><td data-num="20"></td><td><pre>│          └─textures</pre></td></tr><tr><td data-num="21"></td><td><pre>│</pre></td></tr></table></figure><p>model_list.json</p>
+<figure class="highlight json"><figcaption data-lang="JSON"></figcaption><table><tr><td data-num="1"></td><td><pre><span class="token punctuation">&#123;</span></pre></td></tr><tr><td data-num="2"></td><td><pre>    <span class="token property">"models"</span><span class="token operator">:</span> <span class="token punctuation">[</span></pre></td></tr><tr><td data-num="3"></td><td><pre>        <span class="token string">"GroupName/ModelName"</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="4"></td><td><pre>        <span class="token punctuation">[</span></pre></td></tr><tr><td data-num="5"></td><td><pre>            <span class="token string">"Group1/Model1"</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="6"></td><td><pre>            <span class="token string">"Group1/Model2"</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="7"></td><td><pre>            <span class="token string">"Group2/Model1"</span></pre></td></tr><tr><td data-num="8"></td><td><pre>        <span class="token punctuation">]</span></pre></td></tr><tr><td data-num="9"></td><td><pre>    <span class="token punctuation">]</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="10"></td><td><pre>    <span class="token property">"messages"</span><span class="token operator">:</span> <span class="token punctuation">[</span></pre></td></tr><tr><td data-num="11"></td><td><pre>        <span class="token string">"Example 1"</span><span class="token punctuation">,</span></pre></td></tr><tr><td data-num="12"></td><td><pre>        <span class="token string">"Example 2"</span></pre></td></tr><tr><td data-num="13"></td><td><pre>    <span class="token punctuation">]</span></pre></td></tr><tr><td data-num="14"></td><td><pre><span class="token punctuation">&#125;</span></pre></td></tr></table></figure><h3 id="接口用法"><a class="anchor" href="#接口用法">#</a> 接口用法</h3>
+<ul>
+<li><code>/add/</code> - 检测 新增皮肤 并更新 缓存列表</li>
+<li><code>/get/?id=1-23</code>  获取 分组 1 的 第 23 号 皮肤</li>
+<li><code>/rand/?id=1</code>  根据 上一分组 随机切换</li>
+<li><code>/switch/?id=1</code>  根据 上一分组 顺序切换</li>
+<li><code>/rand_textures/?id=1-23</code>  根据 上一皮肤 随机切换 同分组其他皮肤</li>
+<li><code>/switch_textures/?id=1-23</code>  根据 上一皮肤 顺序切换 同分组其他皮肤</li>
+</ul>
+<h2 id="版权声明"><a class="anchor" href="#版权声明">#</a> 版权声明</h2>
+<blockquote>
+<p>(&gt;▽&lt;) 都看到这了，点个 Star 吧～</p>
+</blockquote>
+<p><strong>API 内所有模型 版权均属于原作者，仅供研究学习，不得用于商业用途</strong></p>
+<p>MIT © FGHRSH</p>

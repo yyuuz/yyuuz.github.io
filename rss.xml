@@ -174,9 +174,9 @@ Cand update:cpu累加子距离并排序更新
             <title>基于图的ANNS构建索引相关</title>
             <link>https://yyuuz.github.io/2024/08/09/ANNS/%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84ANNS%E6%9E%84%E5%BB%BA%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3/</link>
             <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
+            <category term="ANNS/GPU" scheme="https://yyuuz.github.io/tags/ANNS-GPU/" />
             <category term="ANNS/索引" scheme="https://yyuuz.github.io/tags/ANNS-%E7%B4%A2%E5%BC%95/" />
             <category term="HNSW" scheme="https://yyuuz.github.io/tags/HNSW/" />
-            <category term="ANNS/GPU" scheme="https://yyuuz.github.io/tags/ANNS-GPU/" />
             <pubDate>Fri, 09 Aug 2024 00:00:00 +0800</pubDate>
             <description><![CDATA[ &lt;p&gt;基础的索引构建算法&lt;/p&gt;
 &lt;h1 id=&#34;knn图&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#knn图&#34;&gt;#&lt;/a&gt; KNN 图&lt;/h1&gt;
@@ -286,6 +286,78 @@ Cand update:cpu累加子距离并排序更新
  [[双调排序]]&lt;/p&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808230210.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
 &lt;h1 id=&#34;fast-k-nn-graph-construction-by-gpu-based-nn-descent&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#fast-k-nn-graph-construction-by-gpu-based-nn-descent&#34;&gt;#&lt;/a&gt; &lt;strong&gt;Fast k-NN graph construction by GPU based NN-Descent&lt;/strong&gt;&lt;/h1&gt;
+ ]]></description>
+        </item>
+        <item>
+            <guid isPermalink="true">https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/</guid>
+            <title>Product Quantization</title>
+            <link>https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/</link>
+            <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
+            <category term="ANNS" scheme="https://yyuuz.github.io/tags/ANNS/" />
+            <pubDate>Thu, 01 Aug 2024 00:00:00 +0800</pubDate>
+            <description><![CDATA[ &lt;h2 id=&#34;分治-quantization&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#分治-quantization&#34;&gt;#&lt;/a&gt; 分治 Quantization&lt;/h2&gt;
+&lt;p&gt;PQ 算法把 D 维向量分成 m 组， 每组进行 Kmeans 聚类算法&lt;br /&gt;
+带来的好处&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;m 组子向量的 Kmeans 算法可以并行求解&lt;/li&gt;
+&lt;li&gt;表示空间增大， K 的 m 次方&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;图示pq算法生成码本与量化的过程&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#图示pq算法生成码本与量化的过程&#34;&gt;#&lt;/a&gt; 图示 PQ 算法生成码本与量化的过程&lt;/h2&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225855.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;SDC 的计算流示意图&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225902.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;ADC 的计算流程 示意图&lt;/p&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225909.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;SDC 与 ADC 的整体复杂度为 O (N*m)， 此时的近邻计算是对整体的 N 来计算，实际中的 N 在现实应用中可能在千万量级以上， 虽然相较于暴力计算已经减少了计算量， 但计算量依然很大 并不实用。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;IVFPQ&lt;/strong&gt;&lt;br /&gt;
+ 找 query 的 topk 最近邻， 不用对整个数据集 N 做计算， 只需要对 “有潜力” 的候选进行计算， 可以通过聚类的方式， 先找到 top 的 cluster， 然后对 cluster 内的数据点一次计算距离&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;coarse quantizer，粗粒度量化器，在原始的向量空间中，基于 kmeans 聚类出 k&#39; 个簇 cluster, k&#39; 的大小一般为 sqrt (n),&lt;/li&gt;
+&lt;li&gt;实用 PQ 对 cluster 内的数据点进行量化，PQ 并不是直接在原始数据上做，而是经过第 1 层量化后，计算出每个数据与其量化中心的残差后，对这个残差数据集进行 PQ 量化。用 PQ 处理残差，而不是原始数据的原因是残差的方差或者能量比原始数据的方差或者能量要小&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225916.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;query 查询 topk 近邻时， 选定的粗聚类中心不一定是 1 个， 可以是多个， 比如 k&#39;&#39;, 朴素的 ADC 算法的复杂度是 O (n×m)，而 IVFADC 算法的复杂度会降低为 O ((N×k&#39;&#39;/k&#39;)×m)。&lt;/p&gt;
+ ]]></description>
+        </item>
+        <item>
+            <guid isPermalink="true">https://yyuuz.github.io/2024/08/01/ANNS/SONG/</guid>
+            <title>SONG</title>
+            <link>https://yyuuz.github.io/2024/08/01/ANNS/SONG/</link>
+            <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
+            <category term="ANNS/搜索" scheme="https://yyuuz.github.io/tags/ANNS-%E6%90%9C%E7%B4%A2/" />
+            <category term="ANNS/GPU" scheme="https://yyuuz.github.io/tags/ANNS-GPU/" />
+            <pubDate>Thu, 01 Aug 2024 00:00:00 +0800</pubDate>
+            <description><![CDATA[ &lt;p&gt;SONG: Approximate Nearest Neighbor Search on GPU&lt;/p&gt;
+&lt;h1 id=&#34;原anns搜索过程&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#原anns搜索过程&#34;&gt;#&lt;/a&gt; 原 ANNS 搜索过程&lt;/h1&gt;
+&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809121502.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;维护三个数据结构 q: 候选集 topk: 结果集 visited: 已访问节点&lt;/p&gt;
+&lt;h1 id=&#34;song系统&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#song系统&#34;&gt;#&lt;/a&gt; SONG 系统&lt;/h1&gt;
+&lt;p&gt;将上述算法全部迁移到了 GPU 中来运行。如图所示为 SONG 系统的处理流程梗概。在每轮迭代中，首先将用于拓展的结点（即需要计算距离的结点）从 GPU 的 Global memory 中存储的图数据中复制到共享内存中（Candidate Locating），随后，多个 GPU 中的 warp（32 个线程）并行地计算这些结点到查询点的距离（Bulk Distance Computation），并将计算得到的结果存到共享内存中。最后，一个 warp 中的其中一个线程使用计算得到的距离数值修改算法中提到的 q，topk，visited 三个数据结构。&lt;br /&gt;
+&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809121525.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;h1 id=&#34;优化&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#优化&#34;&gt;#&lt;/a&gt; 优化&lt;/h1&gt;
+&lt;h2 id=&#34;固定点的度数&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#固定点的度数&#34;&gt;#&lt;/a&gt; 固定点的度数&lt;/h2&gt;
+&lt;p&gt;更好寻址&lt;/p&gt;
+&lt;h2 id=&#34;bloom-filter&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#bloom-filter&#34;&gt;#&lt;/a&gt; [[Bloom filter]]&lt;/h2&gt;
+&lt;p&gt;访问列表不必精确回答 —— 假阳性是可以容忍的（ 已访问告知我们某个元素已被访问，但实际上并没有 ）&lt;/p&gt;
+&lt;h2 id=&#34;有界优先队列&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#有界优先队列&#34;&gt;#&lt;/a&gt; 有界优先队列&lt;/h2&gt;
+&lt;p&gt;只需维护优先队列前 K 个，实现了对称最小 - 最大堆的 GPU 版本&lt;br /&gt;
+&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809121536.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
+&lt;h2 id=&#34;选择性插入优化&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#选择性插入优化&#34;&gt;#&lt;/a&gt; 选择性插入优化&lt;/h2&gt;
+&lt;p&gt;减少哈希表和布隆过滤器的插入以减少内存消耗 在插入之前进行选择：过滤掉所有与前 K 个元素的距离较大的顶点 —— 只有当一个顶点位于当前与查询点距离最近的前 K 个顶点中时，它才会被标记为已访问并推入 q 中&lt;/p&gt;
+&lt;h2 id=&#34;访问删除优化&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#访问删除优化&#34;&gt;#&lt;/a&gt; 访问删除优化&lt;/h2&gt;
+&lt;p&gt;当一个顶点从优先队列 q 中提取并处理后，如果该顶点没有更新 topk，我们可以将其从访问过的列表中删除。同样，当 topk 被更新时，弹出的顶点也可以从访问过的哈希表中删除。 当应用访问删除优化时，哈希表访问过的顶点恰好是 q（大小最多为 K）和 topk（大小最多为 K）的并集。因此，访问过的顶点的大小被限制在 2K 之内。&lt;/p&gt;
+&lt;h2 id=&#34;距离计算&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#距离计算&#34;&gt;#&lt;/a&gt; 距离计算&lt;/h2&gt;
+&lt;p&gt;每个线程负责计算一个维度子集的部分距离。 32 个线程被组织在一起以访问连续的内存地址。如果我们并发处理候选者，则每个线程的内访问模式是独立的 —— 将产生更多的缓存 miss。&lt;/p&gt;
+&lt;h2 id=&#34;超出gpu内存数据集的问题&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#超出gpu内存数据集的问题&#34;&gt;#&lt;/a&gt; 超出 GPU 内存数据集的问题&lt;/h2&gt;
+&lt;h3 id=&#34;使用随机哈希技术&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#使用随机哈希技术&#34;&gt;#&lt;/a&gt; 使用随机哈希技术&lt;/h3&gt;
+&lt;p&gt;为此，采用了随机哈希技术，将高维数据编码为位向量。这样，哈希后的数据集可以适应 GPU 内存，并在低维位上计算距离。&lt;/p&gt;
+&lt;h3 id=&#34;1-bit随机投影&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#1-bit随机投影&#34;&gt;#&lt;/a&gt; 1-bit 随机投影&lt;/h3&gt;
+&lt;p&gt;在众多概率哈希方法中，本文重点介绍了一种名为 “1-bit 随机投影” 的方法。这种方法通过生成一个随机向量 r ，并计算数据向量 u 和 v 在 r 上的投影符号来进行哈希。公式如下：&lt;/p&gt;
+&lt;p&gt;&lt;span class=&#34;katex-display&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34; display=&#34;block&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;P&lt;/mi&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mtext&gt;⁡&lt;/mtext&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;s&lt;/mi&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mo&gt;⋅&lt;/mo&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;s&lt;/mi&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;v&lt;/mi&gt;&lt;mo&gt;⋅&lt;/mo&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;θ&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mo separator=&#34;true&#34;&gt;,&lt;/mo&gt;&lt;mi&gt;v&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;mi&gt;π&lt;/mi&gt;&lt;/mfrac&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;Pr⁡(sgn(u⋅r)=sgn(v⋅r))= 1 - \frac{\theta(u,v)}{\pi} 
+&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.13889em;&#34;&gt;P&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;⁡&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;s&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;g&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;⋅&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;s&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;g&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;⋅&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;))&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.7278em;vertical-align:-0.0833em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;−&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:2.113em;vertical-align:-0.686em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mopen nulldelimiter&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mfrac&#34;&gt;&lt;span class=&#34;vlist-t vlist-t2&#34;&gt;&lt;span class=&#34;vlist-r&#34;&gt;&lt;span class=&#34;vlist&#34; style=&#34;height:1.427em;&#34;&gt;&lt;span style=&#34;top:-2.314em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:3em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;π&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;top:-3.23em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:3em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;frac-line&#34; style=&#34;border-bottom-width:0.04em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;top:-3.677em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:3em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;θ&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;mpunct&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.1667em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;vlist-s&#34;&gt;​&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;vlist-r&#34;&gt;&lt;span class=&#34;vlist&#34; style=&#34;height:0.686em;&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;mclose nulldelimiter&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;其中，θ(u,v) 是向量 u 和 v 之间的角度。如果 r 的条目从独立同分布的柯西分布中采样，而不是正态分布，则这种碰撞概率与 χ2 相似度密切相关。&lt;/p&gt;
+&lt;h3 id=&#34;哈希后的数据处理&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#哈希后的数据处理&#34;&gt;#&lt;/a&gt; 哈希后的数据处理&lt;/h3&gt;
+&lt;p&gt;对于每个数据点，映射到一个 h 位向量中。位向量之间的汉明距离是原始数据中相似性的良好估计。在实现中， h 可以设置为 32 的倍数，以便将位向量存储为几个 32 位无符号整数。这样，一个 h 位向量的内存占用等同于 h/32 个单精度浮点值的空间。&lt;/p&gt;
  ]]></description>
         </item>
         <item>
@@ -486,78 +558,6 @@ Cand update:cpu累加子距离并排序更新
 &lt;h3 id=&#34;访问列表的硬件优化hvr&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#访问列表的硬件优化hvr&#34;&gt;#&lt;/a&gt; 访问列表的硬件优化：HVR&lt;/h3&gt;
 &lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225830.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
 &lt;p&gt;HVR 利用 CRC-12 函数 [45] 生成哈希键，用于从 M 槽哈希表中读取出 M 个值。将输入 Nid 与 M 个值同时进行比较，以生成访问信号。如果 Nid 尚未被访问，则选择逻辑根据 M 个有效信号生成下一个插入位置（槽位号），然后将 Nid 插入目标槽。HVR 利用了 8 个带有 K = 1024 个桶的双端口 BRAMs 和 M = 4 个槽，将所需的芯片内存降低到 32KB。HVR 采用双缓冲技术来隐藏初始化的延迟，该延迟会在每次查询时发生。此外，HVR 中搜索和插入操作的延迟大约为每个节点 2-3 个周期。评估结果显示，平均冲突率约为 0.1％，导致几乎没有延迟开销（≤0.05％），并且没有准确性损失，因为冲突只会导致多余的访问而不会改变图遍历路径。&lt;/p&gt;
- ]]></description>
-        </item>
-        <item>
-            <guid isPermalink="true">https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/</guid>
-            <title>Product Quantization</title>
-            <link>https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/</link>
-            <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
-            <category term="ANNS" scheme="https://yyuuz.github.io/tags/ANNS/" />
-            <pubDate>Thu, 01 Aug 2024 00:00:00 +0800</pubDate>
-            <description><![CDATA[ &lt;h2 id=&#34;分治-quantization&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#分治-quantization&#34;&gt;#&lt;/a&gt; 分治 Quantization&lt;/h2&gt;
-&lt;p&gt;PQ 算法把 D 维向量分成 m 组， 每组进行 Kmeans 聚类算法&lt;br /&gt;
-带来的好处&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;m 组子向量的 Kmeans 算法可以并行求解&lt;/li&gt;
-&lt;li&gt;表示空间增大， K 的 m 次方&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h2 id=&#34;图示pq算法生成码本与量化的过程&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#图示pq算法生成码本与量化的过程&#34;&gt;#&lt;/a&gt; 图示 PQ 算法生成码本与量化的过程&lt;/h2&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225855.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;SDC 的计算流示意图&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225902.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;ADC 的计算流程 示意图&lt;/p&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225909.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;SDC 与 ADC 的整体复杂度为 O (N*m)， 此时的近邻计算是对整体的 N 来计算，实际中的 N 在现实应用中可能在千万量级以上， 虽然相较于暴力计算已经减少了计算量， 但计算量依然很大 并不实用。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;IVFPQ&lt;/strong&gt;&lt;br /&gt;
- 找 query 的 topk 最近邻， 不用对整个数据集 N 做计算， 只需要对 “有潜力” 的候选进行计算， 可以通过聚类的方式， 先找到 top 的 cluster， 然后对 cluster 内的数据点一次计算距离&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;coarse quantizer，粗粒度量化器，在原始的向量空间中，基于 kmeans 聚类出 k&#39; 个簇 cluster, k&#39; 的大小一般为 sqrt (n),&lt;/li&gt;
-&lt;li&gt;实用 PQ 对 cluster 内的数据点进行量化，PQ 并不是直接在原始数据上做，而是经过第 1 层量化后，计算出每个数据与其量化中心的残差后，对这个残差数据集进行 PQ 量化。用 PQ 处理残差，而不是原始数据的原因是残差的方差或者能量比原始数据的方差或者能量要小&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225916.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;query 查询 topk 近邻时， 选定的粗聚类中心不一定是 1 个， 可以是多个， 比如 k&#39;&#39;, 朴素的 ADC 算法的复杂度是 O (n×m)，而 IVFADC 算法的复杂度会降低为 O ((N×k&#39;&#39;/k&#39;)×m)。&lt;/p&gt;
- ]]></description>
-        </item>
-        <item>
-            <guid isPermalink="true">https://yyuuz.github.io/2024/08/01/ANNS/SONG/</guid>
-            <title>SONG</title>
-            <link>https://yyuuz.github.io/2024/08/01/ANNS/SONG/</link>
-            <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
-            <category term="ANNS/搜索" scheme="https://yyuuz.github.io/tags/ANNS-%E6%90%9C%E7%B4%A2/" />
-            <category term="ANNS/GPU" scheme="https://yyuuz.github.io/tags/ANNS-GPU/" />
-            <pubDate>Thu, 01 Aug 2024 00:00:00 +0800</pubDate>
-            <description><![CDATA[ &lt;p&gt;SONG: Approximate Nearest Neighbor Search on GPU&lt;/p&gt;
-&lt;h1 id=&#34;原anns搜索过程&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#原anns搜索过程&#34;&gt;#&lt;/a&gt; 原 ANNS 搜索过程&lt;/h1&gt;
-&lt;p&gt;&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809121502.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
-&lt;p&gt;维护三个数据结构 q: 候选集 topk: 结果集 visited: 已访问节点&lt;/p&gt;
-&lt;h1 id=&#34;song系统&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#song系统&#34;&gt;#&lt;/a&gt; SONG 系统&lt;/h1&gt;
-&lt;p&gt;将上述算法全部迁移到了 GPU 中来运行。如图所示为 SONG 系统的处理流程梗概。在每轮迭代中，首先将用于拓展的结点（即需要计算距离的结点）从 GPU 的 Global memory 中存储的图数据中复制到共享内存中（Candidate Locating），随后，多个 GPU 中的 warp（32 个线程）并行地计算这些结点到查询点的距离（Bulk Distance Computation），并将计算得到的结果存到共享内存中。最后，一个 warp 中的其中一个线程使用计算得到的距离数值修改算法中提到的 q，topk，visited 三个数据结构。&lt;br /&gt;
-&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809121525.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
-&lt;h1 id=&#34;优化&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#优化&#34;&gt;#&lt;/a&gt; 优化&lt;/h1&gt;
-&lt;h2 id=&#34;固定点的度数&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#固定点的度数&#34;&gt;#&lt;/a&gt; 固定点的度数&lt;/h2&gt;
-&lt;p&gt;更好寻址&lt;/p&gt;
-&lt;h2 id=&#34;bloom-filter&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#bloom-filter&#34;&gt;#&lt;/a&gt; [[Bloom filter]]&lt;/h2&gt;
-&lt;p&gt;访问列表不必精确回答 —— 假阳性是可以容忍的（ 已访问告知我们某个元素已被访问，但实际上并没有 ）&lt;/p&gt;
-&lt;h2 id=&#34;有界优先队列&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#有界优先队列&#34;&gt;#&lt;/a&gt; 有界优先队列&lt;/h2&gt;
-&lt;p&gt;只需维护优先队列前 K 个，实现了对称最小 - 最大堆的 GPU 版本&lt;br /&gt;
-&lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240809121536.png&#34; alt=&#34;image.png&#34; /&gt;&lt;/p&gt;
-&lt;h2 id=&#34;选择性插入优化&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#选择性插入优化&#34;&gt;#&lt;/a&gt; 选择性插入优化&lt;/h2&gt;
-&lt;p&gt;减少哈希表和布隆过滤器的插入以减少内存消耗 在插入之前进行选择：过滤掉所有与前 K 个元素的距离较大的顶点 —— 只有当一个顶点位于当前与查询点距离最近的前 K 个顶点中时，它才会被标记为已访问并推入 q 中&lt;/p&gt;
-&lt;h2 id=&#34;访问删除优化&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#访问删除优化&#34;&gt;#&lt;/a&gt; 访问删除优化&lt;/h2&gt;
-&lt;p&gt;当一个顶点从优先队列 q 中提取并处理后，如果该顶点没有更新 topk，我们可以将其从访问过的列表中删除。同样，当 topk 被更新时，弹出的顶点也可以从访问过的哈希表中删除。 当应用访问删除优化时，哈希表访问过的顶点恰好是 q（大小最多为 K）和 topk（大小最多为 K）的并集。因此，访问过的顶点的大小被限制在 2K 之内。&lt;/p&gt;
-&lt;h2 id=&#34;距离计算&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#距离计算&#34;&gt;#&lt;/a&gt; 距离计算&lt;/h2&gt;
-&lt;p&gt;每个线程负责计算一个维度子集的部分距离。 32 个线程被组织在一起以访问连续的内存地址。如果我们并发处理候选者，则每个线程的内访问模式是独立的 —— 将产生更多的缓存 miss。&lt;/p&gt;
-&lt;h2 id=&#34;超出gpu内存数据集的问题&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#超出gpu内存数据集的问题&#34;&gt;#&lt;/a&gt; 超出 GPU 内存数据集的问题&lt;/h2&gt;
-&lt;h3 id=&#34;使用随机哈希技术&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#使用随机哈希技术&#34;&gt;#&lt;/a&gt; 使用随机哈希技术&lt;/h3&gt;
-&lt;p&gt;为此，采用了随机哈希技术，将高维数据编码为位向量。这样，哈希后的数据集可以适应 GPU 内存，并在低维位上计算距离。&lt;/p&gt;
-&lt;h3 id=&#34;1-bit随机投影&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#1-bit随机投影&#34;&gt;#&lt;/a&gt; 1-bit 随机投影&lt;/h3&gt;
-&lt;p&gt;在众多概率哈希方法中，本文重点介绍了一种名为 “1-bit 随机投影” 的方法。这种方法通过生成一个随机向量 r ，并计算数据向量 u 和 v 在 r 上的投影符号来进行哈希。公式如下：&lt;/p&gt;
-&lt;p&gt;&lt;span class=&#34;katex-display&#34;&gt;&lt;span class=&#34;katex&#34;&gt;&lt;span class=&#34;katex-mathml&#34;&gt;&lt;math xmlns=&#34;http://www.w3.org/1998/Math/MathML&#34; display=&#34;block&#34;&gt;&lt;semantics&gt;&lt;mrow&gt;&lt;mi&gt;P&lt;/mi&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mtext&gt;⁡&lt;/mtext&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;s&lt;/mi&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mo&gt;⋅&lt;/mo&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mi&gt;s&lt;/mi&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;v&lt;/mi&gt;&lt;mo&gt;⋅&lt;/mo&gt;&lt;mi&gt;r&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;mo&gt;=&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;−&lt;/mo&gt;&lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;θ&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;(&lt;/mo&gt;&lt;mi&gt;u&lt;/mi&gt;&lt;mo separator=&#34;true&#34;&gt;,&lt;/mo&gt;&lt;mi&gt;v&lt;/mi&gt;&lt;mo stretchy=&#34;false&#34;&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;mi&gt;π&lt;/mi&gt;&lt;/mfrac&gt;&lt;/mrow&gt;&lt;annotation encoding=&#34;application/x-tex&#34;&gt;Pr⁡(sgn(u⋅r)=sgn(v⋅r))= 1 - \frac{\theta(u,v)}{\pi} 
-&lt;/annotation&gt;&lt;/semantics&gt;&lt;/math&gt;&lt;/span&gt;&lt;span class=&#34;katex-html&#34; aria-hidden=&#34;true&#34;&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.13889em;&#34;&gt;P&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;⁡&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;s&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;g&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;⋅&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;s&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;g&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;n&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;⋅&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:1em;vertical-align:-0.25em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;r&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;))&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mrel&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2778em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:0.7278em;vertical-align:-0.0833em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mbin&#34;&gt;−&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.2222em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;base&#34;&gt;&lt;span class=&#34;strut&#34; style=&#34;height:2.113em;vertical-align:-0.686em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mopen nulldelimiter&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mfrac&#34;&gt;&lt;span class=&#34;vlist-t vlist-t2&#34;&gt;&lt;span class=&#34;vlist-r&#34;&gt;&lt;span class=&#34;vlist&#34; style=&#34;height:1.427em;&#34;&gt;&lt;span style=&#34;top:-2.314em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:3em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;π&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;top:-3.23em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:3em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;frac-line&#34; style=&#34;border-bottom-width:0.04em;&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;top:-3.677em;&#34;&gt;&lt;span class=&#34;pstrut&#34; style=&#34;height:3em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord&#34;&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.02778em;&#34;&gt;θ&lt;/span&gt;&lt;span class=&#34;mopen&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34;&gt;u&lt;/span&gt;&lt;span class=&#34;mpunct&#34;&gt;,&lt;/span&gt;&lt;span class=&#34;mspace&#34; style=&#34;margin-right:0.1667em;&#34;&gt;&lt;/span&gt;&lt;span class=&#34;mord mathnormal&#34; style=&#34;margin-right:0.03588em;&#34;&gt;v&lt;/span&gt;&lt;span class=&#34;mclose&#34;&gt;)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;vlist-s&#34;&gt;​&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;vlist-r&#34;&gt;&lt;span class=&#34;vlist&#34; style=&#34;height:0.686em;&#34;&gt;&lt;span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;mclose nulldelimiter&#34;&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p&gt;其中，θ(u,v) 是向量 u 和 v 之间的角度。如果 r 的条目从独立同分布的柯西分布中采样，而不是正态分布，则这种碰撞概率与 χ2 相似度密切相关。&lt;/p&gt;
-&lt;h3 id=&#34;哈希后的数据处理&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#哈希后的数据处理&#34;&gt;#&lt;/a&gt; 哈希后的数据处理&lt;/h3&gt;
-&lt;p&gt;对于每个数据点，映射到一个 h 位向量中。位向量之间的汉明距离是原始数据中相似性的良好估计。在实现中， h 可以设置为 32 的倍数，以便将位向量存储为几个 32 位无符号整数。这样，一个 h 位向量的内存占用等同于 h/32 个单精度浮点值的空间。&lt;/p&gt;
  ]]></description>
         </item>
     </channel>
