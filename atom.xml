@@ -76,6 +76,11 @@
  跨域设置 - 创建规则&lt;br /&gt;
 &lt;img loading=&#34;lazy&#34; data-src=&#34;https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240810154933.png&#34; alt=&#34;image.png&#34; /&gt;&lt;br /&gt;
 Over!(偶娃！)&lt;/p&gt;
+&lt;p&gt;Over 个鬼啊！无论怎么设置跨域都报错 No &#39;Access-Control-Allow-Origin&#39; header is present on the requested resource.  If an opaque response serves your needs, set the request&#39;s mode to &#39;no-cors&#39; to fetch the resource with CORS disabled.&lt;br /&gt;
+tnnd! 这到底是为什么啊&lt;/p&gt;
+&lt;p&gt;查了半天，网址写错了，最后没有 &lt;code&gt;/&lt;/code&gt; &lt;br /&gt;
+······&lt;br /&gt;
+偶娃！&lt;/p&gt;
 &lt;h1 id=&#34;小插曲&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#小插曲&#34;&gt;#&lt;/a&gt; 小插曲&lt;/h1&gt;
 &lt;p&gt;&lt;code&gt;git clone&lt;/code&gt;  时报错&lt;/p&gt;
 &lt;figure class=&#34;highlight bash&#34;&gt;&lt;figcaption data-lang=&#34;bash&#34;&gt;&lt;/figcaption&gt;&lt;table&gt;&lt;tr&gt;&lt;td data-num=&#34;1&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;Filename too long&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td data-num=&#34;2&#34;&gt;&lt;/td&gt;&lt;td&gt;&lt;pre&gt;fatal: fetch-pack: invalid index-pack output&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;&lt;p&gt;使用命令&lt;/p&gt;
