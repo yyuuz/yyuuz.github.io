@@ -174,9 +174,9 @@ Cand update:cpu累加子距离并排序更新
             <title>基于图的ANNS构建索引相关</title>
             <link>https://yyuuz.github.io/2024/08/09/ANNS/%E5%9F%BA%E4%BA%8E%E5%9B%BE%E7%9A%84ANNS%E6%9E%84%E5%BB%BA%E7%B4%A2%E5%BC%95%E7%9B%B8%E5%85%B3/</link>
             <category term="ANNS" scheme="https://yyuuz.github.io/categories/ANNS/" />
-            <category term="ANNS/GPU" scheme="https://yyuuz.github.io/tags/ANNS-GPU/" />
             <category term="ANNS/索引" scheme="https://yyuuz.github.io/tags/ANNS-%E7%B4%A2%E5%BC%95/" />
             <category term="HNSW" scheme="https://yyuuz.github.io/tags/HNSW/" />
+            <category term="ANNS/GPU" scheme="https://yyuuz.github.io/tags/ANNS-GPU/" />
             <pubDate>Fri, 09 Aug 2024 00:00:00 +0800</pubDate>
             <description><![CDATA[ &lt;p&gt;基础的索引构建算法&lt;/p&gt;
 &lt;h1 id=&#34;knn图&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#knn图&#34;&gt;#&lt;/a&gt; KNN 图&lt;/h1&gt;
