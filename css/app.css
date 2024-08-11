@@ -6243,3 +6243,7 @@ span.label {
 .audio.playing .cover .disc {
   animation-play-state: running;
 }
+#busuanzi-wrap {
+  width: 100%;
+  text-align: center;
+}
