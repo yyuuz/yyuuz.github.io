@@ -17,6 +17,16 @@
             ]
         },
         {
+            "id": "https://yyuuz.github.io/2024/10/31/%E8%AE%B0%E5%BD%95/%E7%94%B3%E8%AF%B7nic.eu.org%E5%9F%9F%E5%90%8D/",
+            "url": "https://yyuuz.github.io/2024/10/31/%E8%AE%B0%E5%BD%95/%E7%94%B3%E8%AF%B7nic.eu.org%E5%9F%9F%E5%90%8D/",
+            "title": "申请nic.eu.org域名",
+            "date_published": "2024-10-30T16:00:00.000Z",
+            "content_html": "<h1 id=\"20241031申请\"><a class=\"anchor\" href=\"#20241031申请\">#</a> 2024.10.31 申请</h1>\n",
+            "tags": [
+                "记录"
+            ]
+        },
+        {
             "id": "https://yyuuz.github.io/2024/10/03/OTHERS/%E5%AE%9E%E9%AA%8C%20%20GEM5%E5%92%8CNVMain%E7%9A%84%E4%BD%BF%E7%94%A8/",
             "url": "https://yyuuz.github.io/2024/10/03/OTHERS/%E5%AE%9E%E9%AA%8C%20%20GEM5%E5%92%8CNVMain%E7%9A%84%E4%BD%BF%E7%94%A8/",
             "title": "实验  GEM5和NVMain的使用",
@@ -89,6 +99,17 @@
             ]
         },
         {
+            "id": "https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/",
+            "url": "https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/",
+            "title": "Product Quantization",
+            "date_published": "2024-07-31T16:00:00.000Z",
+            "content_html": "<h2 id=\"分治-quantization\"><a class=\"anchor\" href=\"#分治-quantization\">#</a> 分治 Quantization</h2>\n<p>PQ 算法把 D 维向量分成 m 组， 每组进行 Kmeans 聚类算法<br />\n带来的好处</p>\n<ol>\n<li>m 组子向量的 Kmeans 算法可以并行求解</li>\n<li>表示空间增大， K 的 m 次方</li>\n</ol>\n<h2 id=\"图示pq算法生成码本与量化的过程\"><a class=\"anchor\" href=\"#图示pq算法生成码本与量化的过程\">#</a> 图示 PQ 算法生成码本与量化的过程</h2>\n<p><img loading=\"lazy\" data-src=\"https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225855.png\" alt=\"image.png\" /></p>\n<p>SDC 的计算流示意图</p>\n<p><img loading=\"lazy\" data-src=\"https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225902.png\" alt=\"image.png\" /></p>\n<p>ADC 的计算流程 示意图</p>\n<p><img loading=\"lazy\" data-src=\"https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225909.png\" alt=\"image.png\" /></p>\n<p>SDC 与 ADC 的整体复杂度为 O (N*m)， 此时的近邻计算是对整体的 N 来计算，实际中的 N 在现实应用中可能在千万量级以上， 虽然相较于暴力计算已经减少了计算量， 但计算量依然很大 并不实用。</p>\n<p><strong>IVFPQ</strong><br />\n 找 query 的 topk 最近邻， 不用对整个数据集 N 做计算， 只需要对 “有潜力” 的候选进行计算， 可以通过聚类的方式， 先找到 top 的 cluster， 然后对 cluster 内的数据点一次计算距离</p>\n<ol>\n<li>coarse quantizer，粗粒度量化器，在原始的向量空间中，基于 kmeans 聚类出 k' 个簇 cluster, k' 的大小一般为 sqrt (n),</li>\n<li>实用 PQ 对 cluster 内的数据点进行量化，PQ 并不是直接在原始数据上做，而是经过第 1 层量化后，计算出每个数据与其量化中心的残差后，对这个残差数据集进行 PQ 量化。用 PQ 处理残差，而不是原始数据的原因是残差的方差或者能量比原始数据的方差或者能量要小</li>\n</ol>\n<p><img loading=\"lazy\" data-src=\"https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225916.png\" alt=\"image.png\" /></p>\n<p>query 查询 topk 近邻时， 选定的粗聚类中心不一定是 1 个， 可以是多个， 比如 k'', 朴素的 ADC 算法的复杂度是 O (n×m)，而 IVFADC 算法的复杂度会降低为 O ((N×k''/k')×m)。</p>\n",
+            "tags": [
+                "ANNS",
+                "ANNS"
+            ]
+        },
+        {
             "id": "https://yyuuz.github.io/2024/08/01/ANNS/SONG/",
             "url": "https://yyuuz.github.io/2024/08/01/ANNS/SONG/",
             "title": "SONG",
@@ -98,17 +119,6 @@
                 "ANNS",
                 "ANNS/搜索",
                 "ANNS/GPU"
-            ]
-        },
-        {
-            "id": "https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/",
-            "url": "https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/",
-            "title": "Product Quantization",
-            "date_published": "2024-07-31T16:00:00.000Z",
-            "content_html": "<h2 id=\"分治-quantization\"><a class=\"anchor\" href=\"#分治-quantization\">#</a> 分治 Quantization</h2>\n<p>PQ 算法把 D 维向量分成 m 组， 每组进行 Kmeans 聚类算法<br />\n带来的好处</p>\n<ol>\n<li>m 组子向量的 Kmeans 算法可以并行求解</li>\n<li>表示空间增大， K 的 m 次方</li>\n</ol>\n<h2 id=\"图示pq算法生成码本与量化的过程\"><a class=\"anchor\" href=\"#图示pq算法生成码本与量化的过程\">#</a> 图示 PQ 算法生成码本与量化的过程</h2>\n<p><img loading=\"lazy\" data-src=\"https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225855.png\" alt=\"image.png\" /></p>\n<p>SDC 的计算流示意图</p>\n<p><img loading=\"lazy\" data-src=\"https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225902.png\" alt=\"image.png\" /></p>\n<p>ADC 的计算流程 示意图</p>\n<p><img loading=\"lazy\" data-src=\"https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225909.png\" alt=\"image.png\" /></p>\n<p>SDC 与 ADC 的整体复杂度为 O (N*m)， 此时的近邻计算是对整体的 N 来计算，实际中的 N 在现实应用中可能在千万量级以上， 虽然相较于暴力计算已经减少了计算量， 但计算量依然很大 并不实用。</p>\n<p><strong>IVFPQ</strong><br />\n 找 query 的 topk 最近邻， 不用对整个数据集 N 做计算， 只需要对 “有潜力” 的候选进行计算， 可以通过聚类的方式， 先找到 top 的 cluster， 然后对 cluster 内的数据点一次计算距离</p>\n<ol>\n<li>coarse quantizer，粗粒度量化器，在原始的向量空间中，基于 kmeans 聚类出 k' 个簇 cluster, k' 的大小一般为 sqrt (n),</li>\n<li>实用 PQ 对 cluster 内的数据点进行量化，PQ 并不是直接在原始数据上做，而是经过第 1 层量化后，计算出每个数据与其量化中心的残差后，对这个残差数据集进行 PQ 量化。用 PQ 处理残差，而不是原始数据的原因是残差的方差或者能量比原始数据的方差或者能量要小</li>\n</ol>\n<p><img loading=\"lazy\" data-src=\"https://pichost-yu.oss-cn-wuhan-lr.aliyuncs.com/img/20240808225916.png\" alt=\"image.png\" /></p>\n<p>query 查询 topk 近邻时， 选定的粗聚类中心不一定是 1 个， 可以是多个， 比如 k'', 朴素的 ADC 算法的复杂度是 O (n×m)，而 IVFADC 算法的复杂度会降低为 O ((N×k''/k')×m)。</p>\n",
-            "tags": [
-                "ANNS",
-                "ANNS"
             ]
         }
     ]
