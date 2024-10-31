@@ -1,3 +1,5 @@
+https://yyuuz.github.io/2024/10/31/OTHERS/MinFlow%20%20High-performance%20and%20Cost-efficient%20Data%20Passing%20for%20IO-intensive%20Stateful%20Serverless%20Analytics/
+https://yyuuz.github.io/2024/10/03/OTHERS/%E5%AE%9E%E9%AA%8C%20%20GEM5%E5%92%8CNVMain%E7%9A%84%E4%BD%BF%E7%94%A8/
 https://yyuuz.github.io/2024/08/17/ANNS/%E5%86%8D%E8%AF%BBHNSW/
 https://yyuuz.github.io/2024/08/10/BLOG/ShokaX%E4%B8%BB%E9%A2%98%E6%B7%BB%E5%8A%A0live2d+%E8%B5%84%E6%BA%90%E4%B8%8A%E4%BC%A0%E9%98%BF%E9%87%8C%E4%BA%91OSS/
 https://yyuuz.github.io/2024/08/01/ANNS/Product%20Quantization/
@@ -9,10 +11,13 @@ https://yyuuz.github.io/
 https://yyuuz.github.io/tags/CXL/
 https://yyuuz.github.io/tags/ANNS-%E6%90%9C%E7%B4%A2/
 https://yyuuz.github.io/tags/ANNS-FPGA/
-https://yyuuz.github.io/tags/ANNS/
-https://yyuuz.github.io/tags/ANNS-GPU/
 https://yyuuz.github.io/tags/ANNS-%E7%B4%A2%E5%BC%95/
 https://yyuuz.github.io/tags/HNSW/
 https://yyuuz.github.io/tags/ShokaX/
+https://yyuuz.github.io/tags/ANNS-GPU/
+https://yyuuz.github.io/tags/ANNS/
+https://yyuuz.github.io/tags/Gem/
+https://yyuuz.github.io/tags/nvm/
 https://yyuuz.github.io/categories/ANNS/
 https://yyuuz.github.io/categories/BLOG/
+https://yyuuz.github.io/categories/OTHERS/
